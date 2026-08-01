@@ -1,0 +1,65 @@
+# ==========================================
+# Entorno y Secretos (CRÍTICO)
+# ==========================================
+.env
+.env.*
+!.env.template
+*.pem
+*.key
+*.jks
+keystore.properties
+local.properties
+
+# ==========================================
+# Logs y temporales de IAs
+# ==========================================
+*.log
+.agent_history/
+.opencode_cache/
+.chat_sessions/
+temp/
+tmp/
+
+# ==========================================
+# Node / Python
+# ==========================================
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# ==========================================
+# Java / Kotlin / Spring
+# ==========================================
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+target/
+.mvn/
+build/
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+.kotlin_module
+.kotlin_dependencies
+
+# ==========================================
+# Android
+# ==========================================
+*.apk
+*.ap_
+*.aab
+*.dex
+captures/
+.cxx/
+.idea/
+.project
+.classpath
+
+# ==========================================
+# Sistema Operativo
+# ==========================================
+.DS_Store
+Thumbs.db
