@@ -1,5 +1,5 @@
 # ==========================================
-# Entorno y Secretos (CRÍTICO)
+# Entorno and Secretos (CRITICO)
 # ==========================================
 .env
 .env.*
@@ -11,14 +11,14 @@ keystore.properties
 local.properties
 
 # ==========================================
-# Memoria local por-usuario (nunca se commitea)
+# Memoria local por-user (never se commitea)
 # ==========================================
 memory.jsonl
 memory-export.md
 .local/
 
 # ==========================================
-# Logs y temporales de IAs
+# Logs and temporales de IAs
 # ==========================================
 *.log
 .agent_history/

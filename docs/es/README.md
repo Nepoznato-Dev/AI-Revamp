@@ -6,7 +6,7 @@ This repository serves as the single source of truth for **OpenCode** and **Anti
 
 ### 🌐 Language convention
 
-- **File and folder names:** always English, ASCII (`snake_case` or `kebab-case`). No accents, `n`, or spaces.
+- **File and folder names:** always English, ASCII (`snake_case` or `kebab-case`). No accents, `ñ`, or spaces.
 - **Code and technical configs** (skills, plugins, hooks, configs): English.
 - **Docs and team-facing communication** (PR comments, commit messages, README sections aimed at the team): Spanish when the team reads Spanish.
 - A new document picks one language for its whole content; do not mix within the same file.
@@ -67,18 +67,18 @@ If Chrome is present the value is `chrome` (uses the system browser, no download
 
 ---
 
-## 🧠 Context management
+## 🧠 Gestión de contexto
 
-Models begin to degrade at approximately 40-44% of their context window (in a 1M model, ~400k tokens). Below that point, compaction is unnecessary and degrades useful context; above it, work takes place in the degradation zone.
+Los modelos empiezan a degradarse a partir de ~40-44% de su ventana de contexto (en un modelo de 1M, ~400k tokens). Por debajo de ese punto comprimir es innecesario y degrada el contexto útil; por encima se trabaja en la zona de degradación.
 
-**DCP** (`@tarquinen/opencode-dcp`) manages this as a guardrail, with native auto-compaction disabled (`compaction.auto: false`):
+Para gestionarlo se usa **DCP** (`@tarquinen/opencode-dcp`) como guardrail, con la auto-compactación nativa desactivada (`compaction.auto: false`):
 
 - **~40% del contexto** (`maxContextLimit: "40%"` en `config/dcp.jsonc`): DCP empieza a *empujar suavemente* al modelo a comprimir (`nudgeForce: "soft"`).
-- **Ask the user:** the `compress` tool uses `permission: "ask"`, so the user decides whether to compact or continue (accepting the degradation risk).
-- **No automatic compaction:** neither OpenCode (`compaction.auto: false`) nor DCP compacts on its own. The user always makes the decision.
-- **Notification:** `pruneNotification: "detailed"` reports pruning in chat.
+- **Pregunta al usuario:** la herramienta `compress` usa `permission: "ask"`, así que antes de comprimir **se pide permiso al usuario**, quien decide comprimir o continuar (asumiendo el riesgo de degradación).
+- **Sin compactado automático:** ni OpenCode (`compaction.auto: false`) ni DCP comprimen por su cuenta. La decisión siempre es del usuario.
+- **Notificación:** `pruneNotification: "detailed"` informa en el chat cuando se poda contenido.
 
-> **Why compaction is not performed earlier:** `magic-context` had a ~128k fallback that compacted prematurely in 1M-token models. It was removed; DCP with its 40% threshold is the single source of truth for context.
+> **Por qué no se compacta antes:** `magic-context` tenía un fallback de ~128k que compactaba prematuramente en modelos de 1M. Se eliminó; DCP con el umbral del 40% es la única fuente de verdad para el contexto.
 
 ---
 
@@ -89,10 +89,10 @@ Models begin to degrade at approximately 40-44% of their context window (in a 1M
 ├── skills/                 # ~115 curated skills + 4 custom stack + 13 planning skills
 │   ├── wayfinder/          # 🗺️ Wayfinder suite (Matt Pocock): wayfinder, setup-matt-pocock-skills,
 │   │                       #    to-spec, grilling, grill-with-docs, research, triage
-│   ├── ask-matt/           # 🧭 Router de skills (custom, reference /plan-phases-implement)
-│   ├── to-tickets/         # 🎫 Tickets con blocking edges (custom, with GitHub mechanics)
-│   ├── plan-phases-create/ # 📐 Phased planning: plan + contratos publicos (custom)
-│   ├── plan-phases-implement/ # 🛠️ Implements one phase per invocation + STOP (custom)
+│   ├── ask-matt/           # 🧭 Router de skills (custom, referencia /plan-phases-implement)
+│   ├── to-tickets/         # 🎫 Tickets con blocking edges (custom, con mecánicas GitHub)
+│   ├── plan-phases-create/ # 📐 Planificación por fases: plan + contratos públicos (custom)
+│   ├── plan-phases-implement/ # 🛠️ Implementa 1 fase por invocación + STOP (custom)
 │   ├── create-work-breakdown-structure/  # WBS + WBS Dictionary (agent-almanac)
 │   ├── estimate-costs/     # 📊 CBS bottom-up con rate card (skill custom)
 │   └── ...
@@ -100,7 +100,7 @@ Models begin to degrade at approximately 40-44% of their context window (in a 1M
 ├── config/skills.json             # Antigravity explicit skill discovery entry (~/.agent/skills)
 ├── config/hooks.json              # Antigravity lifecycle hooks (env-protection, notifications)
 ├── hooks/                  # Hook scripts (env-protection.sh, notify.sh)
-├── agents/                 # OpenCode custom agents (architect.md, ...)
+├── agents/                 # OpenCode custom agents (arquitecto.md, ...)
 ├── plugins/                # OpenCode custom plugins (env-protection, notifications, ...)
 ├── extensions/lumusitech/  # Antigravity / Gemini CLI extension (gemini-extension.json)
 ├── scripts/                # memory-setup.{sh,ps1}: per-user memory path written to .env
@@ -149,7 +149,7 @@ Third-party npm plugins are declared in `config/opencode.jsonc` under `"plugin"`
 
 - `@tarquinen/opencode-dcp` (pinned `@3.1.15`) — dynamic context pruning. Its `compress` tool replaces stale, closed conversation spans with technical summaries. Configured (see `config/dcp.jsonc`) to **nudge softly at ~40% of the model context** and to **ask the user** before compressing (`compress.permission: "ask"`).
 
-> **Removed:** `@cortexkit/opencode-magic-context` was removed. Its hardcoded ~128k fallback triggered premature compaction in 1M-token models and its auto-update-checker failed at startup. Context management is now handled solely by DCP (see [Gestion de contexto](#-gestion-de-contexto)).
+> **Removed:** `@cortexkit/opencode-magic-context` was removed. Its hardcoded ~128k fallback triggered premature compaction in 1M-token models and its auto-update-checker failed at startup. Context management is now handled solely by DCP (see [Gestión de contexto](#-gestión-de-contexto)).
 
 ### Antigravity / Gemini CLI extension
 
@@ -193,7 +193,7 @@ The MCP memory server stores its knowledge graph (entities, relations, observati
 
 `scripts/memory-setup.{sh,ps1}` detects your identity, writes `MEMORY_FILE_PATH` into `~/.agent/.env`, and ensures your shell/PowerShell profile loads it.
 
-> **Why forward slashes on Windows?** opencode substitutes `{env:MEMORY_FILE_PATH}` in `config/opencode.jsonc` **verbatim** (without JSON-escaping the value). A Windows path with backslashes (`C:\Users\...`) would inject invalid JSON escape sequences and make opencode fail with `config/opencode.jsonc is not valid JSON(C)`. `scripts/memory-setup.ps1` therefore normalizes the path to forward slashes (`/`), which Windows, PowerShell and Node all accept.
+> **Why forward slashes on Windows?** opencode substitutes `{env:MEMORY_FILE_PATH}` in `config/opencode.jsonc` **verbatim** (without JSON-escaping the value). A Windows path with backslashes (`C:\Users\...`) would inject invalid JSON escape sequences and make opencode fail with `config/opencode.jsonc is not valid JSON(C)`. `memory-scripts/setup.ps1` therefore normalizes the path to forward slashes (`/`), which Windows, PowerShell and Node all accept.
 
 To move the graph to another machine, use the `/memory-export` and `/memory-import` skills (a Markdown document with an embedded JSONL block) — the file itself is never synced via git.
 
@@ -304,7 +304,7 @@ Planning skills come from two upstream sources (MIT) plus custom skills committe
 |---|---|
 | [mattpocock/skills](https://github.com/mattpocock/skills) | wayfinder, setup-matt-pocock-skills, to-spec, grilling, grill-with-docs, research, triage |
 | [pjt222/agent-almanac](https://github.com/pjt222/agent-almanac) | create-work-breakdown-structure |
-| Custom (never refreshed) | estimate-costs (rate card CBS), to-tickets (with GitHub mechanics), ask-matt (reference `/plan-phases-implement`), plan-phases-create, plan-phases-implement |
+| Custom (never refreshed) | estimate-costs (rate card CBS), to-tickets (con mecánicas GitHub), ask-matt (referencia `/plan-phases-implement`), plan-phases-create, plan-phases-implement |
 
 > **Note:** `to-tickets` and `ask-matt` are vendored upstream but are **customized here**. They were removed from the refresh list so `--refresh-vendored-skills` never overwrites our adaptations.
 

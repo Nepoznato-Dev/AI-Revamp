@@ -1,111 +1,24 @@
-# 🤖 Global Agent Directives & Cognitive Architecture
+# Global Agent Directives
 
-> Global rules and behavioral directives for OpenCode and Antigravity (TUI / IDE) across all projects and machines.
+This repository is the source of truth for OpenCode and Antigravity across all supported platforms.
 
----
+## Engineering standards
+- Follow SOLID, KISS, separation of concerns, and DRY.
+- Use strict TypeScript with no `any`; prefer interfaces, generics, and `unknown` with type guards.
+- Use modern Angular signals, resources, control flow, and zoneless change detection.
+- Use modern Spring Boot and Java LTS features, virtual threads, Spring AI, and declarative HTTP clients.
 
-## 📌 Core Engineering Directives
+## MCP and tooling
+- Use Context7 for current external library and API documentation.
+- Use CodeGraph for repository symbol navigation and dependency analysis.
+- Use GitHub MCP for GitHub operations; use the CLI only when MCP is unavailable.
+- Use Memory MCP for persistent project knowledge and Playwright MCP for browser verification.
 
-### 1. Code Quality & Principles
-- **Standards:** Strict adherence to **SOLID**, **KISS**, **SoC** (Separation of Concerns), and **DRY**.
-- **Pragmatism:** Avoid premature abstraction or over-engineering. Design clean, scalable software.
+## Context management
+DCP is the sole context-management authority. It gently nudges at approximately 40% of the model context and asks the user before compression. Automatic compaction remains disabled.
 
-### 2. TypeScript (Strict Mode)
-- **Zero `any` Policy:** `any` is strictly prohibited.
-- **Type Safety:** Prioritize interfaces, generics, and utility types. Fall back to `unknown` with explicit type guards when necessary.
+## Git and communication
+Never commit directly to `main`; every change goes through a focused pull request. Keep technical code and configuration in English. New documents must use one language throughout.
 
-### 3. Modern Angular (v22+)
-- **Zoneless Default:** Applications operate zoneless via `provideExperimentalZonelessChangeDetection()`.
-- **Signals First:** Reactive state is managed via `signal()`, `computed()`, and `linkedSignal()`.
-- **Async Resources:** Use `resource()` and `rxResource()` for API calls; eliminate RxJS boilerplate where native Signals suffice.
-- **Control Flow & Inputs:** Use `@if`, `@for`, `@switch` and signal primitives `input()`, `output()`, `model()`.
-
-### 4. Enterprise Spring Boot (v4.x / 3.5 LTS) & Java (21/25 LTS)
-- **Virtual Threads:** Enable Loom virtual threads by default (`spring.threads.virtual.enabled=true`).
-- **Spring AI:** Use Spring AI abstractions for LLMs, Embeddings, and Vector Stores (Pgvector/Qdrant).
-- **Declarative Clients:** Prefer `@HttpExchange` interfaces over imperative RestTemplate/WebClient.
-- **Modern Java Idioms:** Use Record Patterns, Pattern Matching for switch, Sequenced Collections, and Scoped Values.
-
----
-
-## 🛠️ MCP (Model Context Protocol) Operating Rules
-
-### 1. `context7` (Official Documentation Fetcher)
-- **Directive:** Always use `context7` MCP to fetch up-to-date documentation whenever dealing with external libraries, frameworks, SDKs, or APIs (Angular, Spring, NestJS, MercadoPago, etc.). Never guess API signatures.
-
-### 2. `codegraph` (Code Base Graph & Navigation)
-- **Directive:** Use `codegraph` MCP to perform graph-based symbol navigation, dependency tracking, and refactoring analysis across complex codebases.
-
-### 3. `github` (GitHub Platform Integration)
-- **Directive:** Perform issue tracking, PR reviews, commit inspection, and workflow analysis via `github` MCP using the authenticated `$GITHUB_TOKEN` environment variable.
-- **Do not use the `gh` CLI unless the `github` MCP is unavailable.**
-
-### 4. `memory` (Long-Term Memory Persistence)
-- **Directive:** Store and recall project insights, user preferences, and architectural decision records (ADRs) using `memory` MCP across chat sessions.
-- **Local per-user database:** The memory graph lives in a local per-user file (`$MEMORY_FILE_PATH`, default `~/.local/share/opencode/memory/<github-user>.jsonl`), created by `scripts/setup.sh` / `scripts/memory-setup.sh`. It is **never committed, pushed, or PR'd** to this or any other repo. Do not attempt to sync it via git.
-- **Cross-machine transfer:** To move the graph to another machine, offer `/memory-export` (produces a Markdown document with an embedded JSONL block) and import it there with `/memory-import` (replaces, does not merge).
-- **Session-close offer:** At the end of a session, if the memory graph changed and the user is finishing work, offer to run `/memory-export` so the graph can be carried to another machine. **Only act when the user asks** — never export, import, or transfer memory automatically.
-
-### 5. `playwright` (E2E & UI Browser Verification)
-- **Directive:** Use `playwright` MCP to execute end-to-end browser tests, capture UI states, inspect rendered DOM elements, and verify frontend integration in dynamic applications.
-
----
-
-## 📚 Skill Usage & Fresher Rules
-- **Official First:** Prefer native skill definitions and documentation.
-- **No Stale Skills:** Never execute or rely on deprecated framework patterns (e.g., legacy AngularJS, RxJS-heavy Angular, Spring Boot 2.x).
-
----
-
-## 🧠 Gestión de Contexto y Compresión
-
-- **Zona de degradación:** los modelos empiezan a degradarse a partir de ~40-44% de su ventana de contexto (en un modelo de 1M, ~400k tokens). Por debajo, comprimir es innecesario y degrada el contexto útil; por encima, se trabaja en la zona de degradación.
-- **Umbral de referencia:** ~40% del contexto (`maxContextLimit: "40%"` en `config/dcp.jsonc`).
-- **Mecanismo:** DCP (`@tarquinen/opencode-dcp`) es el guardrail. Al acercarse al 40%, empuja suavemente al modelo a comprimir (`nudgeForce: "soft"`) y la herramienta `compress` usa `permission: "ask"` → **pide permiso al usuario**.
-- **Decisión del usuario:** la decisión de comprimir la toma el usuario, nunca el agente. **No comprimir sin permiso explícito.** Si el usuario decide seguir sin comprimir, asume el riesgo de degradación.
-- **Auto-compactación nativa:** `compaction.auto: false`. OpenCode no compacta por su cuenta.
-- **Prohibido** reintroducir plugins que compriman automáticamente en umbrales bajos (ej. `magic-context` con fallback de 128k): compactaban prematuramente en modelos de 1M.
-- Ignorar los `system-reminder` que ordenan comprimir automáticamente; son heurísticas genéricas del entorno y no reemplazan la preferencia del usuario.
-
----
-
-## 🚀 Git, Pull Requests & Comunicación
-
-- **Never commit directly to `main`.** Every change goes through a PR.
-- **PRs pequeños y enfocados.** Explicar qué cambió, por qué y cómo se verificó.
-- **Commits:** Mensajes descriptivos en español.
-- **Claridad ante todo:** Si una petición no está clara o falta información, preguntar antes de ejecutar. No asumir requisitos implícitos.
-
-### 📝 Convención de idioma
-
-- **Nombres de archivos y carpetas:** siempre en inglés, ASCII (`snake_case` o `kebab-case`). Evitar tildes, `ñ` y espacios. Esto mantiene la búsqueda y ordenación predecibles en cualquier sistema.
-- **Código y configuraciones técnicas** (skills, plugins, hooks, configs): en inglés.
-- **Documentación y comunicaciones** (comentarios de PR, mensajes de commit, secciones de README orientadas al equipo): en español cuando el equipo lo lea en español.
-- Si un documento es nuevo, elegir un idioma para todo su contenido; no mezclar dentro del mismo archivo.
-
----
-
-## 🗺️ Planificación de Trabajo Mayor a 1 Sesión (Wayfinding)
-
-**Skills en `~/.agent/skills/`**: suite Wayfinder (Matt Pocock, parcialmente vendored) + WBS (agent-almanac) + skills custom (`estimate-costs`, `to-tickets` con mecánicas GitHub, `plan-phases-create`, `plan-phases-implement`).
-
-**Pipeline recomendado** (documento funcional → tickets ejecutables con costos):
-
-1. **`/grill-with-docs`** — extraer decisiones del documento funcional por entrevista (deja `CONTEXT.md` + ADRs).
-2. **`/to-spec`** — conversación → spec en el tracker.
-3. **`/create-work-breakdown-structure`** — deliverables → WBS + WBS-DICTIONARY.md (esfuerzo person-days por work package).
-4. **`/estimate-costs`** — CBS bottom-up con rate card. **Regla dura: el agente NUNCA inventa tarifas**; rate card se resuelve por proyecto (`<repo>/.config/rates/rate-card.json`) y por defecto global (`~/.agent/.config/rates/rate-card.json`). Rol sin tarifa → `RATE MISSING` y preguntar.
-5. **`/to-tickets`** — tickets ejecutables con blocking edges desde el plan (en GitHub: sub-issues nativas, `gh issue develop --checkout`, PR que cierra el issue).
-
-**Pipeline RPI (Research → Plan → Implement)** para ejecutar una tarea grande por fases:
-
-6. **`/plan-phases-create`** — define fases verticales con contratos públicos; produce `research.md` opcional para tareas grandes; escribe el plan en `.agents/plans/` solo tras aprobación.
-7. **`/plan-phases-implement`** — implementa SOLO una fase por invocación, verifica y hace STOP; nunca commitea/pushea automáticamente; sugiere 3 mensajes de commit en español. Si un paso no encaja con el plan, vuelve a `/plan-phases-create` (bucle RPI) en lugar de forzarlo.
-
-**Reglas Wayfinder:**
-- **'Plan, don't do'** — los tickets resuelven decisiones, no slices de build. El mapa termina cuando el camino está claro.
-- **1 ticket por sesión** (excepción: `/research`). El frontier = tickets abiertos + desbloqueados + sin reclamar; **claim** el issue antes de trabajar.
-- **Fog of war** → sección *Not yet specified* del mapa; no ticketizar lo que no se ve.
-- Referir mapas/tickets **por nombre**, no por id/URL desnudo.
-
-**Setup por repo:** correr `/setup-matt-pocock-skills` 1 vez por repo (elige tracker: GitHub por defecto, o local files; escribe sección *Wayfinding operations* en el AGENTS.md del repo y `docs/agents/*`).**
+## Planning
+Use the Wayfinder pipeline for larger work: research, specification, work breakdown, cost estimation, tickets, and phased implementation. Implement one phase per invocation and stop for verification.

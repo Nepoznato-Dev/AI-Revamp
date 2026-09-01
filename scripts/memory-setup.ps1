@@ -34,12 +34,12 @@ function Prompt-Value {
 }
 
 function Confirm-Choice {
-    # Confirm-Choice <message> <default_yes y/n> ; returns $true if yes
+    # Confirm-Choice <message> <default_yes and/n> ; returns $true if yes
     param([string]$Message, [string]$Default)
-    if (-not $INTERACTIVE) { return ($Default -in @('y', 'Y')) }
-    $answer = Read-Host "${Message} (y/n) [${Default}]"
+    if (-not $INTERACTIVE) { return ($Default -in @('and', 'Y')) }
+    $answer = Read-Host "${Message} (and/n) [${Default}]"
     if ([string]::IsNullOrWhiteSpace($answer)) { $answer = $Default }
-    return ($answer -in @('y', 'Y'))
+    return ($answer -in @('and', 'Y'))
 }
 
 function Sanitize-Name {
@@ -65,10 +65,10 @@ function Detect-User {
 
 $USER_SLUG = Sanitize-Name (Detect-User)
 if ([string]::IsNullOrWhiteSpace($USER_SLUG)) {
-    Write-Error "❌ No se pudo detectar el usuario del sistema."
+    Write-Error "❌ No se pudo detectar el user of the system."
     exit 1
 }
-Write-Host "👤 Usuario detectado: ${USER_SLUG}"
+Write-Host "👤 Detected user: ${USER_SLUG}"
 
 # --- 2. Pick memory location -------------------------------------------------
 $DEFAULT_MEM_FILE = (Join-Path $HOME ".local\share\opencode\memory\${USER_SLUG}.jsonl").Replace('\', '/')
@@ -77,7 +77,7 @@ $MEM_FILE = $null
 if (-not [string]::IsNullOrWhiteSpace($env:MEMORY_FILE_PATH)) {
     # Respect an already-set value (from environment)
     $MEM_FILE = $env:MEMORY_FILE_PATH
-    Write-Host "ℹ️  Usando MEMORY_FILE_PATH existente: ${MEM_FILE}"
+    Write-Host "ℹ️  Usando MEMORY_FILE_PATH existing: ${MEM_FILE}"
 } elseif (Test-Path -LiteralPath $ENV_FILE) {
     # Respect a value already persisted in .env (idempotent re-run)
     $envMatch = [System.Text.RegularExpressions.Regex]::Match(
@@ -88,7 +88,7 @@ if (-not [string]::IsNullOrWhiteSpace($env:MEMORY_FILE_PATH)) {
     }
 }
 if (-not $MEM_FILE) {
-    $MEM_FILE = Prompt-Value "¿Ubicación de la memoria local de '${USER_SLUG}'?" $DEFAULT_MEM_FILE
+    $MEM_FILE = Prompt-Value "Ubicacion de la memory local de '${USER_SLUG}'?" $DEFAULT_MEM_FILE
     # expand leading ~ if provided
     if ($MEM_FILE -like '~*') { $MEM_FILE = $HOME + $MEM_FILE.Substring(1) }
 }
@@ -103,7 +103,7 @@ $MEM_DIR = Split-Path -Parent $MEM_FILE
 try {
     New-Item -ItemType Directory -Path $MEM_DIR -Force -ErrorAction Stop | Out-Null
 } catch {
-    Write-Warning "No se pudo crear '${MEM_DIR}': $($_.Exception.Message). Usando la ubicación por defecto."
+    Write-Warning "Could not create '${MEM_DIR}': $($_.Exception.Message). Usando la location by default."
     $MEM_FILE = $DEFAULT_MEM_FILE
     $MEM_DIR = Split-Path -Parent $MEM_FILE
     New-Item -ItemType Directory -Path $MEM_DIR -Force | Out-Null
@@ -140,21 +140,21 @@ Set-EnvValue -File $ENV_FILE -Key 'MEMORY_FILE_PATH' -Value $MEM_FILE
 # Keep the current session consistent: if the profile loaded a stale backslash
 # path, opencode launched from this same session would read that obsolete value.
 $env:MEMORY_FILE_PATH = $MEM_FILE
-Write-Host "✅ MEMORY_FILE_PATH=${MEM_FILE} escrito en ${ENV_FILE}"
+Write-Host "✅ MEMORY_FILE_PATH=${MEM_FILE} written in ${ENV_FILE}"
 
 # --- 4. Ensure the PowerShell profile loads ~/.agent/.env --------------------
 $PROFILE_FILE = $PROFILE
 $MARKER = '# >>> lumusitech agent env >>>'
 
 if ([string]::IsNullOrWhiteSpace($PROFILE_FILE)) {
-    Write-Host "⚠️  No se pudo determinar el perfil de PowerShell. Configura la carga de ~/.agent/.env manualmente."
+    Write-Host "⚠️  No se pudo determinar el perfil de PowerShell. Configure la carga de ~/.agent/.env manually."
 } else {
     $profileDir = Split-Path -Parent $PROFILE_FILE
     $profileExists = Test-Path -LiteralPath $PROFILE_FILE
     $profileText = if ($profileExists) { [System.IO.File]::ReadAllText($PROFILE_FILE) } else { '' }
 
     if ($profileText.Contains($MARKER)) {
-        Write-Host "✅ ${PROFILE_FILE} ya carga ~/.agent/.env"
+        Write-Host "✅ ${PROFILE_FILE} already loads ~/.agent/.env"
     } else {
         New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
         $block = @'
@@ -174,7 +174,7 @@ if (Test-Path "$HOME\.agent\.env") {
         if ($newProfile.Length -gt 0 -and -not $newProfile.EndsWith("`n")) { $newProfile += "`n" }
         $newProfile += $block + "`n"
         [System.IO.File]::WriteAllText($PROFILE_FILE, $newProfile, (New-Object System.Text.UTF8Encoding($false)))
-        Write-Host "✅ Bloque de carga añadido a ${PROFILE_FILE} (abre un terminal nuevo para aplicarlo)"
+        Write-Host "✅ Bloque de carga added a ${PROFILE_FILE} (abre a terminal nuevo for aplicarlo)"
     }
 }
 
@@ -186,27 +186,27 @@ $LINE_COUNT = {
 }
 
 if ((Test-Path -LiteralPath $MEM_FILE) -and ((Get-Item -LiteralPath $MEM_FILE).Length -gt 0)) {
-    Write-Host "✅ Base de memoria per-usuario ya existe: ${MEM_FILE} ($(& $LINE_COUNT) líneas)"
+    Write-Host "✅ Base de memory per-user ya existe: ${MEM_FILE} ($(& $LINE_COUNT) lines)"
 } elseif (Test-Path -LiteralPath (Join-Path $REPO_DIR 'memory.jsonl')) {
-    if (Confirm-Choice "¿Migrar el memory.jsonl legacy del repo a ${MEM_FILE}?" 'y') {
+    if (Confirm-Choice "Migrar el memory.jsonl legacy of the repo a ${MEM_FILE}?" 'and') {
         Copy-Item -Path (Join-Path $REPO_DIR 'memory.jsonl') -Destination $MEM_FILE -Force
-        Write-Host "✅ Migrado memory.jsonl legacy → ${MEM_FILE} ($(& $LINE_COUNT) líneas)"
-        if (Confirm-Choice "¿Eliminar el memory.jsonl del repo (para no commitear memorias)?" 'y') {
+        Write-Host "✅ Migrated memory.jsonl legacy → ${MEM_FILE} ($(& $LINE_COUNT) lines)"
+        if (Confirm-Choice "Eliminar el memory.jsonl of the repo (for no commitear memorias)?" 'and') {
             Remove-Item -Path (Join-Path $REPO_DIR 'memory.jsonl') -Force
-            Write-Host "✅ Eliminado $(Join-Path $REPO_DIR 'memory.jsonl')"
+            Write-Host "✅ Removed $(Join-Path $REPO_DIR 'memory.jsonl')"
         }
     } else {
         [System.IO.File]::WriteAllText($MEM_FILE, '', (New-Object System.Text.UTF8Encoding($false)))
-        Write-Host "ℹ️  Base vacía creada en ${MEM_FILE} (no se migró el legacy)"
+        Write-Host "ℹ️  Empty database created in ${MEM_FILE} (legacy file was not migrated)"
     }
 } else {
     [System.IO.File]::WriteAllText($MEM_FILE, '', (New-Object System.Text.UTF8Encoding($false)))
-    Write-Host "✅ Base de memoria creada: ${MEM_FILE}"
+    Write-Host "✅ Base de memory creada: ${MEM_FILE}"
 }
 
 Write-Host ""
-Write-Host "🎉 Memoria per-usuario lista:"
+Write-Host "🎉 Memoria per-user lista:"
 Write-Host "   • Archivo:   ${MEM_FILE}"
-Write-Host "   • Variable:  MEMORY_FILE_PATH (en ${ENV_FILE})"
+Write-Host "   • Variable:  MEMORY_FILE_PATH (in ${ENV_FILE})"
 Write-Host "   • Profile:   $(if ($PROFILE_FILE) { $PROFILE_FILE } else { 'no configurado' })"
-Write-Host "   • Próximo paso: reinicia opencode para que el MCP memory use la nueva ruta."
+Write-Host "   • Next step: restart opencode for that el MCP memory use la nueva ruta."

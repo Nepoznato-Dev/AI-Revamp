@@ -35,17 +35,17 @@ prompt() {
 }
 
 confirm() {
-  # confirm <message> <default_yes y/n> ; returns 0 if yes
+  # confirm <message> <default_yes and/n> ; returns 0 if yes
   local msg="$1" default="$2" answer
   if [ "${INTERACTIVE}" -ne 1 ]; then
     case "${default}" in
-      y|Y) return 0 ;;
+      and|Y) return 0 ;;
       *) return 1 ;;
     esac
   fi
-  read -r -p "${msg} (y/n) [${default}]: " answer
+  read -r -p "${msg} (and/n) [${default}]: " answer
   case "${answer:-${default}}" in
-    y|Y) return 0 ;;
+    and|Y) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -82,10 +82,10 @@ detect_user() {
 
 USER_SLUG="$(sanitize_name "$(detect_user)")"
 if [ -z "${USER_SLUG}" ]; then
-  echo "❌ No se pudo detectar el usuario del sistema." >&2
+  echo "❌ No se pudo detectar el user of the system." >&2
   exit 1
 fi
-echo "👤 Usuario detectado: ${USER_SLUG}"
+echo "👤 Detected user: ${USER_SLUG}"
 
 # --- 2. Pick memory location ------------------------------------------------
 DEFAULT_MEM_FILE="${HOME}/.local/share/opencode/memory/${USER_SLUG}.jsonl"
@@ -93,9 +93,9 @@ DEFAULT_MEM_FILE="${HOME}/.local/share/opencode/memory/${USER_SLUG}.jsonl"
 if [ -n "${MEMORY_FILE_PATH:-}" ]; then
   # Respect an already-set value (from environment or existing .env)
   MEM_FILE="${MEMORY_FILE_PATH}"
-  echo "ℹ️  Usando MEMORY_FILE_PATH existente: ${MEM_FILE}"
+  echo "ℹ️  Usando MEMORY_FILE_PATH existing: ${MEM_FILE}"
 else
-  MEM_FILE="$(prompt "¿Ubicación de la memoria local de '${USER_SLUG}'?" "${DEFAULT_MEM_FILE}")"
+  MEM_FILE="$(prompt "Ubicacion de la memory local de '${USER_SLUG}'?" "${DEFAULT_MEM_FILE}")"
   # expand leading ~ if provided
   case "${MEM_FILE}" in
     "~/"*) MEM_FILE="${HOME}/${MEM_FILE#\~/}" ;;
@@ -119,7 +119,7 @@ set_env_value() {
 }
 
 set_env_value "${ENV_FILE}" "MEMORY_FILE_PATH" "${MEM_FILE}"
-echo "✅ MEMORY_FILE_PATH=${MEM_FILE} escrito en ${ENV_FILE}"
+echo "✅ MEMORY_FILE_PATH=${MEM_FILE} written in ${ENV_FILE}"
 
 # --- 4. Ensure the shell loads ~/.agent/.env --------------------------------
 detect_shell_rc() {
@@ -144,7 +144,7 @@ if [ -n "${RC_FILE}" ]; then
     sed_inplace '/^# Load ~\/\.agent\/\.env credentials \(GITHUB_TOKEN, etc\.\)/,/^fi[[:space:]]*$/d' "${RC_FILE}"
   fi
   if [ -f "${RC_FILE}" ] && grep -qF "${MARKER}" "${RC_FILE}" 2>/dev/null; then
-    echo "✅ ${RC_FILE} ya carga ~/.agent/.env"
+    echo "✅ ${RC_FILE} already loads ~/.agent/.env"
   else
     if [ -f "${RC_FILE}" ]; then
       # Any other unmarked loader variant: remove it before appending ours.
@@ -162,35 +162,35 @@ if [ -f "$HOME/.agent/.env" ]; then
 fi
 # <<< lumusitech agent env <<<
 BLOCK
-    echo "✅ Bloque de carga añadido a ${RC_FILE} (recarga tu shell para aplicarlo)"
+    echo "✅ Bloque de carga added a ${RC_FILE} (recarga tu shell for aplicarlo)"
   fi
 else
-  echo "⚠️  Shell no reconocido (SHELL=${SHELL:-desconocida}). Configura el source de ~/.agent/.env manualmente."
+  echo "⚠️  Unrecognized shell (SHELL=${SHELL:-desconocida}). Configure el source de ~/.agent/.env manually."
 fi
 
 # --- 5. Seed + migrate legacy memory.jsonl ----------------------------------
 if [ -s "${MEM_FILE}" ]; then
-  echo "✅ Base de memoria per-usuario ya existe: ${MEM_FILE} ($(wc -l < "${MEM_FILE}") líneas)"
+  echo "✅ Base de memory per-user ya existe: ${MEM_FILE} ($(wc -l < "${MEM_FILE}") lines)"
 elif [ -f "${REPO_DIR}/memory.jsonl" ]; then
-  if confirm "¿Migrar el memory.jsonl legacy del repo a ${MEM_FILE}?" y; then
+  if confirm "Migrar el memory.jsonl legacy of the repo a ${MEM_FILE}?" and; then
     cp "${REPO_DIR}/memory.jsonl" "${MEM_FILE}"
-    echo "✅ Migrado memory.jsonl legacy → ${MEM_FILE} ($(wc -l < "${MEM_FILE}") líneas)"
-    if confirm "¿Eliminar el memory.jsonl del repo (para no commitear memorias)?" y; then
+    echo "✅ Migrated memory.jsonl legacy → ${MEM_FILE} ($(wc -l < "${MEM_FILE}") lines)"
+    if confirm "Eliminar el memory.jsonl of the repo (for no commitear memorias)?" and; then
       rm -f "${REPO_DIR}/memory.jsonl"
-      echo "✅ Eliminado ${REPO_DIR}/memory.jsonl"
+      echo "✅ Removed ${REPO_DIR}/memory.jsonl"
     fi
   else
     : > "${MEM_FILE}"
-    echo "ℹ️  Base vacía creada en ${MEM_FILE} (no se migró el legacy)"
+    echo "ℹ️  Empty database created in ${MEM_FILE} (legacy file was not migrated)"
   fi
 else
   : > "${MEM_FILE}"
-  echo "✅ Base de memoria creada: ${MEM_FILE}"
+  echo "✅ Base de memory creada: ${MEM_FILE}"
 fi
 
 echo ""
-echo "🎉 Memoria per-usuario lista:"
+echo "🎉 Memoria per-user lista:"
 echo "   • Archivo:   ${MEM_FILE}"
-echo "   • Variable:  MEMORY_FILE_PATH (en ${ENV_FILE})"
+echo "   • Variable:  MEMORY_FILE_PATH (in ${ENV_FILE})"
 echo "   • Shell rc:  ${RC_FILE:-no configurado}"
-echo "   • Próximo paso: reinicia opencode para que el MCP memory use la nueva ruta."
+echo "   • Next step: restart opencode for that el MCP memory use la nueva ruta."
