@@ -77,18 +77,18 @@ $MEM_FILE = $null
 if (-not [string]::IsNullOrWhiteSpace($env:MEMORY_FILE_PATH)) {
     # Respect an already-set value (from environment)
     $MEM_FILE = $env:MEMORY_FILE_PATH
-    Write-Host "ℹ️  Usando MEMORY_FILE_PATH existing: ${MEM_FILE}"
+    Write-Host "ℹ️  Using existing MEMORY_FILE_PATH: ${MEM_FILE}"
 } elseif (Test-Path -LiteralPath $ENV_FILE) {
     # Respect a value already persisted in .env (idempotent re-run)
     $envMatch = [System.Text.RegularExpressions.Regex]::Match(
         [System.IO.File]::ReadAllText($ENV_FILE), '(?m)^\s*MEMORY_FILE_PATH=(.*?)\s*$')
     if ($envMatch.Success -and -not [string]::IsNullOrWhiteSpace($envMatch.Groups[1].Value)) {
         $MEM_FILE = $envMatch.Groups[1].Value.Trim().Trim('"')
-        Write-Host "ℹ️  Usando MEMORY_FILE_PATH de ${ENV_FILE}: ${MEM_FILE}"
+        Write-Host "ℹ️  Using MEMORY_FILE_PATH from ${ENV_FILE}: ${MEM_FILE}"
     }
 }
 if (-not $MEM_FILE) {
-    $MEM_FILE = Prompt-Value "Ubicacion de la memory local de '${USER_SLUG}'?" $DEFAULT_MEM_FILE
+    $MEM_FILE = Prompt-Value "Location of the local memory for '${USER_SLUG}'?" $DEFAULT_MEM_FILE
     # expand leading ~ if provided
     if ($MEM_FILE -like '~*') { $MEM_FILE = $HOME + $MEM_FILE.Substring(1) }
 }
@@ -103,7 +103,7 @@ $MEM_DIR = Split-Path -Parent $MEM_FILE
 try {
     New-Item -ItemType Directory -Path $MEM_DIR -Force -ErrorAction Stop | Out-Null
 } catch {
-    Write-Warning "Could not create '${MEM_DIR}': $($_.Exception.Message). Usando la location by default."
+    Write-Warning "Could not create '${MEM_DIR}': $($_.Exception.Message). Using the default location."
     $MEM_FILE = $DEFAULT_MEM_FILE
     $MEM_DIR = Split-Path -Parent $MEM_FILE
     New-Item -ItemType Directory -Path $MEM_DIR -Force | Out-Null
@@ -140,14 +140,14 @@ Set-EnvValue -File $ENV_FILE -Key 'MEMORY_FILE_PATH' -Value $MEM_FILE
 # Keep the current session consistent: if the profile loaded a stale backslash
 # path, opencode launched from this same session would read that obsolete value.
 $env:MEMORY_FILE_PATH = $MEM_FILE
-Write-Host "✅ MEMORY_FILE_PATH=${MEM_FILE} written in ${ENV_FILE}"
+Write-Host "✅ MEMORY_FILE_PATH=${MEM_FILE} written to ${ENV_FILE}"
 
 # --- 4. Ensure the PowerShell profile loads ~/.agent/.env --------------------
 $PROFILE_FILE = $PROFILE
 $MARKER = '# >>> lumusitech agent env >>>'
 
 if ([string]::IsNullOrWhiteSpace($PROFILE_FILE)) {
-    Write-Host "⚠️  No se pudo determinar el perfil de PowerShell. Configure la carga de ~/.agent/.env manually."
+    Write-Host "⚠️  Could not determine the PowerShell profile. Configure the ~/.agent/.env source manually."
 } else {
     $profileDir = Split-Path -Parent $PROFILE_FILE
     $profileExists = Test-Path -LiteralPath $PROFILE_FILE
@@ -186,7 +186,7 @@ $LINE_COUNT = {
 }
 
 if ((Test-Path -LiteralPath $MEM_FILE) -and ((Get-Item -LiteralPath $MEM_FILE).Length -gt 0)) {
-    Write-Host "✅ Base de memory per-user ya existe: ${MEM_FILE} ($(& $LINE_COUNT) lines)"
+    Write-Host "✅ Per-user memory database already exists: ${MEM_FILE} ($(& $LINE_COUNT) lines)"
 } elseif (Test-Path -LiteralPath (Join-Path $REPO_DIR 'memory.jsonl')) {
     if (Confirm-Choice "Migrate the repository legacy memory.jsonl to ${MEM_FILE}?" 'y') {
         Copy-Item -Path (Join-Path $REPO_DIR 'memory.jsonl') -Destination $MEM_FILE -Force
@@ -201,12 +201,12 @@ if ((Test-Path -LiteralPath $MEM_FILE) -and ((Get-Item -LiteralPath $MEM_FILE).L
     }
 } else {
     [System.IO.File]::WriteAllText($MEM_FILE, '', (New-Object System.Text.UTF8Encoding($false)))
-    Write-Host "✅ Base de memory creada: ${MEM_FILE}"
+    Write-Host "✅ Memory database created: ${MEM_FILE}"
 }
 
 Write-Host ""
-Write-Host "🎉 Memoria per-user lista:"
-Write-Host "   • Archivo:   ${MEM_FILE}"
+Write-Host "🎉 Per-user memory is ready:"
+Write-Host "   • File:       ${MEM_FILE}"
 Write-Host "   • Variable:  MEMORY_FILE_PATH (in ${ENV_FILE})"
-Write-Host "   • Profile:   $(if ($PROFILE_FILE) { $PROFILE_FILE } else { 'no configurado' })"
+Write-Host "   • Profile:    $(if ($PROFILE_FILE) { $PROFILE_FILE } else { 'not configured' })"
 Write-Host "   • Next step: restart opencode so the memory MCP uses the new path."

@@ -193,7 +193,7 @@ The MCP memory server stores its knowledge graph (entities, relations, observati
 
 `scripts/memory-setup.{sh,ps1}` detects your identity, writes `MEMORY_FILE_PATH` into `~/.agent/.env`, and ensures your shell/PowerShell profile loads it.
 
-> **Why forward slashes on Windows?** opencode substitutes `{env:MEMORY_FILE_PATH}` in `config/opencode.jsonc` **verbatim** (without JSON-escaping the value). A Windows path with backslashes (`C:\Users\...`) would inject invalid JSON escape sequences and make opencode fail with `config/opencode.jsonc is not valid JSON(C)`. `memory-scripts/setup.ps1` therefore normalizes the path to forward slashes (`/`), which Windows, PowerShell and Node all accept.
+> **Why forward slashes on Windows?** opencode substitutes `{env:MEMORY_FILE_PATH}` in `config/opencode.jsonc` **verbatim** (without JSON-escaping the value). A Windows path with backslashes (`C:\Users\...`) would inject invalid JSON escape sequences and make opencode fail with `config/opencode.jsonc is not valid JSON(C)`. `scripts/memory-setup.ps1` therefore normalizes the path to forward slashes (`/`), which Windows, PowerShell and Node all accept.
 
 To move the graph to another machine, use the `/memory-export` and `/memory-import` skills (a Markdown document with an embedded JSONL block) — the file itself is never synced via git.
 

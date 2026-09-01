@@ -93,9 +93,9 @@ DEFAULT_MEM_FILE="${HOME}/.local/share/opencode/memory/${USER_SLUG}.jsonl"
 if [ -n "${MEMORY_FILE_PATH:-}" ]; then
   # Respect an already-set value (from environment or existing .env)
   MEM_FILE="${MEMORY_FILE_PATH}"
-  echo "ℹ️  Usando MEMORY_FILE_PATH existing: ${MEM_FILE}"
+  echo "ℹ️  Using existing MEMORY_FILE_PATH: ${MEM_FILE}"
 else
-  MEM_FILE="$(prompt "Ubicacion de la memory local de '${USER_SLUG}'?" "${DEFAULT_MEM_FILE}")"
+  MEM_FILE="$(prompt "Location of the local memory for '${USER_SLUG}'?" "${DEFAULT_MEM_FILE}")"
   # expand leading ~ if provided
   case "${MEM_FILE}" in
     "~/"*) MEM_FILE="${HOME}/${MEM_FILE#\~/}" ;;
@@ -119,7 +119,7 @@ set_env_value() {
 }
 
 set_env_value "${ENV_FILE}" "MEMORY_FILE_PATH" "${MEM_FILE}"
-echo "✅ MEMORY_FILE_PATH=${MEM_FILE} written in ${ENV_FILE}"
+echo "✅ MEMORY_FILE_PATH=${MEM_FILE} written to ${ENV_FILE}"
 
 # --- 4. Ensure the shell loads ~/.agent/.env --------------------------------
 detect_shell_rc() {
@@ -162,15 +162,15 @@ if [ -f "$HOME/.agent/.env" ]; then
 fi
 # <<< lumusitech agent env <<<
 BLOCK
-    echo "✅ Bloque de carga added a ${RC_FILE} (recarga tu shell for aplicarlo)"
+    echo "✅ Loader block added to ${RC_FILE} (reload your shell to apply it)"
   fi
 else
-  echo "⚠️  Unrecognized shell (SHELL=${SHELL:-desconocida}). Configure el source de ~/.agent/.env manually."
+  echo "⚠️  Unrecognized shell (SHELL=${SHELL:-unknown}). Configure the ~/.agent/.env source manually."
 fi
 
 # --- 5. Seed + migrate legacy memory.jsonl ----------------------------------
 if [ -s "${MEM_FILE}" ]; then
-  echo "✅ Base de memory per-user ya existe: ${MEM_FILE} ($(wc -l < "${MEM_FILE}") lines)"
+  echo "✅ Per-user memory database already exists: ${MEM_FILE} ($(wc -l < "${MEM_FILE}") lines)"
 elif [ -f "${REPO_DIR}/memory.jsonl" ]; then
   if confirm "Migrate the repository legacy memory.jsonl to ${MEM_FILE}?" y; then
     cp "${REPO_DIR}/memory.jsonl" "${MEM_FILE}"
@@ -185,12 +185,12 @@ elif [ -f "${REPO_DIR}/memory.jsonl" ]; then
   fi
 else
   : > "${MEM_FILE}"
-  echo "✅ Base de memory creada: ${MEM_FILE}"
+  echo "✅ Memory database created: ${MEM_FILE}"
 fi
 
 echo ""
-echo "🎉 Memoria per-user lista:"
-echo "   • Archivo:   ${MEM_FILE}"
+echo "🎉 Per-user memory is ready:"
+echo "   • File:       ${MEM_FILE}"
 echo "   • Variable:  MEMORY_FILE_PATH (in ${ENV_FILE})"
-echo "   • Shell rc:  ${RC_FILE:-no configurado}"
+echo "   • Shell rc:   ${RC_FILE:-not configured}"
 echo "   • Next step: restart opencode so the memory MCP uses the new path."
