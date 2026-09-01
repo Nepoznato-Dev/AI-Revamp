@@ -196,10 +196,10 @@ if (-not (Test-Path -LiteralPath $ENV_FILE)) {
 $GEMINI_CONFIG_DIR = Join-Path $HOME '.gemini\config'
 
 Link-Dir -Path (Join-Path $GEMINI_CONFIG_DIR 'skills')     -Target (Join-Path $REPO_DIR 'skills')
-Link-File -Path (Join-Path $GEMINI_CONFIG_DIR 'skills.json') -Source (Join-Path $REPO_DIR 'skills.json')
+Link-File -Path (Join-Path $GEMINI_CONFIG_DIR 'skills.json') -Source (Join-Path $REPO_DIR 'config\skills.json')
 Link-File -Path (Join-Path $GEMINI_CONFIG_DIR 'GEMINI.md')   -Source (Join-Path $REPO_DIR 'docs/en/GEMINI.md')
-Link-File -Path (Join-Path $GEMINI_CONFIG_DIR 'mcp.json')    -Source (Join-Path $REPO_DIR 'mcp.json')
-Link-File -Path (Join-Path $GEMINI_CONFIG_DIR 'mcp_config.json') -Source (Join-Path $REPO_DIR 'mcp.json')
+Link-File -Path (Join-Path $GEMINI_CONFIG_DIR 'mcp.json')    -Source (Join-Path $REPO_DIR 'config\mcp.json')
+Link-File -Path (Join-Path $GEMINI_CONFIG_DIR 'mcp_config.json') -Source (Join-Path $REPO_DIR 'config\mcp.json')
 
 # config/hooks.json: generated with absolute Windows paths (Antigravity runs hook
 # commands through a shell that cannot expand `~`). Written only when content
@@ -265,9 +265,9 @@ Link-Dir -Path (Join-Path $GEMINI_EXT_DIR 'lumusitech') -Target (Join-Path $REPO
 # ==============================================================================
 $OPENCODE_CONFIG_DIR = Join-Path $HOME '.config\opencode'
 
-Link-File -Path (Join-Path $OPENCODE_CONFIG_DIR 'opencode.jsonc') -Source (Join-Path $REPO_DIR 'opencode.jsonc')
-Link-File -Path (Join-Path $OPENCODE_CONFIG_DIR 'dcp.jsonc')      -Source (Join-Path $REPO_DIR 'dcp.jsonc')
-Link-File -Path (Join-Path $OPENCODE_CONFIG_DIR 'tui.json')      -Source (Join-Path $REPO_DIR 'tui.json')
+Link-File -Path (Join-Path $OPENCODE_CONFIG_DIR 'opencode.jsonc') -Source (Join-Path $REPO_DIR 'config\opencode.jsonc')
+Link-File -Path (Join-Path $OPENCODE_CONFIG_DIR 'dcp.jsonc')      -Source (Join-Path $REPO_DIR 'config\dcp.jsonc')
+Link-File -Path (Join-Path $OPENCODE_CONFIG_DIR 'tui.json')      -Source (Join-Path $REPO_DIR 'config\tui.json')
 Link-File -Path (Join-Path $OPENCODE_CONFIG_DIR 'AGENTS.md')      -Source (Join-Path $REPO_DIR 'docs/en/AGENTS.md')
 Link-Dir  -Path (Join-Path $OPENCODE_CONFIG_DIR 'plugins')        -Target (Join-Path $REPO_DIR 'plugins')
 
@@ -529,8 +529,8 @@ $SECRET_PATTERNS = @(
 )
 $FOUND_SECRET = $false
 $CONFIG_FILES = @(
-    (Join-Path $REPO_DIR 'mcp.json'),
-    (Join-Path $REPO_DIR 'opencode.jsonc'),
+    (Join-Path $REPO_DIR 'config\mcp.json'),
+    (Join-Path $REPO_DIR 'config\opencode.jsonc'),
     (Join-Path $REPO_DIR 'extensions\lumusitech\gemini-extension.json')
 )
 foreach ($cfg in $CONFIG_FILES) {

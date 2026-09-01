@@ -6,7 +6,7 @@ This repository serves as the single source of truth for **OpenCode** and **Anti
 
 ### 🌐 Language convention
 
-- **File and folder names:** always English, ASCII (`snake_case` or `kebab-case`). No accents, `n`, or spaces.
+- **File and folder names:** always English, ASCII (`snake_case` or `kebab-case`). Use no accented or non-ASCII characters and no spaces.
 - **Code and technical configs** (skills, plugins, hooks, configs): English.
 - **Docs and team-facing communication** (PR comments, commit messages, README sections aimed at the team): Spanish when the team reads Spanish.
 - A new document picks one language for its whole content; do not mix within the same file.
@@ -73,7 +73,7 @@ Models begin to degrade at approximately 40-44% of their context window (in a 1M
 
 **DCP** (`@tarquinen/opencode-dcp`) manages this as a guardrail, with native auto-compaction disabled (`compaction.auto: false`):
 
-- **~40% del contexto** (`maxContextLimit: "40%"` en `config/dcp.jsonc`): DCP empieza a *empujar suavemente* al modelo a comprimir (`nudgeForce: "soft"`).
+- **~40% of context** (`maxContextLimit: "40%"` in `config/dcp.jsonc`): DCP gently nudges the model to compact (`nudgeForce: "soft"`).
 - **Ask the user:** the `compress` tool uses `permission: "ask"`, so the user decides whether to compact or continue (accepting the degradation risk).
 - **No automatic compaction:** neither OpenCode (`compaction.auto: false`) nor DCP compacts on its own. The user always makes the decision.
 - **Notification:** `pruneNotification: "detailed"` reports pruning in chat.
@@ -90,13 +90,13 @@ Models begin to degrade at approximately 40-44% of their context window (in a 1M
 │   ├── wayfinder/          # 🗺️ Wayfinder suite (Matt Pocock): wayfinder, setup-matt-pocock-skills,
 │   │                       #    to-spec, grilling, grill-with-docs, research, triage
 │   ├── ask-matt/           # 🧭 Router de skills (custom, reference /plan-phases-implement)
-│   ├── to-tickets/         # 🎫 Tickets con blocking edges (custom, with GitHub mechanics)
+│   ├── to-tickets/         # 🎫 Tickets with blocking edges (custom, with GitHub mechanics)
 │   ├── plan-phases-create/ # 📐 Phased planning: plan + contratos publicos (custom)
 │   ├── plan-phases-implement/ # 🛠️ Implements one phase per invocation + STOP (custom)
 │   ├── create-work-breakdown-structure/  # WBS + WBS Dictionary (agent-almanac)
-│   ├── estimate-costs/     # 📊 CBS bottom-up con rate card (skill custom)
+│   ├── estimate-costs/     # 📊 Bottom-up CBS with rate card (custom skill)
 │   └── ...
-├── .config/rates/          # Global rate card default para estimate-costs
+├── .config/rates/          # Global default rate card for estimate-costs
 ├── config/skills.json             # Antigravity explicit skill discovery entry (~/.agent/skills)
 ├── config/hooks.json              # Antigravity lifecycle hooks (env-protection, notifications)
 ├── hooks/                  # Hook scripts (env-protection.sh, notify.sh)

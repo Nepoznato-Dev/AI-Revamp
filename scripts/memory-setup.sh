@@ -35,17 +35,17 @@ prompt() {
 }
 
 confirm() {
-  # confirm <message> <default_yes and/n> ; returns 0 if yes
+  # confirm <message> <default_yes y/n> ; returns 0 if yes
   local msg="$1" default="$2" answer
   if [ "${INTERACTIVE}" -ne 1 ]; then
     case "${default}" in
-      and|Y) return 0 ;;
+      y|Y) return 0 ;;
       *) return 1 ;;
     esac
   fi
-  read -r -p "${msg} (and/n) [${default}]: " answer
+  read -r -p "${msg} (y/n) [${default}]: " answer
   case "${answer:-${default}}" in
-    and|Y) return 0 ;;
+    y|Y) return 0 ;;
     *) return 1 ;;
   esac
 }

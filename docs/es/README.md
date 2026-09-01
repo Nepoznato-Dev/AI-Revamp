@@ -11,13 +11,13 @@ This repository serves as the single source of truth for **OpenCode** and **Anti
 - **Docs and team-facing communication** (PR comments, commit messages, README sections aimed at the team): Spanish when the team reads Spanish.
 - A new document picks one language for its whole content; do not mix within the same file.
 
-Full directives in [`docs/en/AGENTS.md`](file:///home/carludev/.agent/AGENTS.md).
+Full directives are in [`../en/AGENTS.md`](../en/AGENTS.md).
 
 ---
 
 ## 🏗️ Core Engineering Directives
 
-All AI agents in this workspace operate under strict directives defined in [`docs/en/AGENTS.md`](file:///home/carludev/.agent/AGENTS.md):
+All AI agents in this workspace operate under strict directives defined in [`../en/AGENTS.md`](../en/AGENTS.md):
 
 1. **Code Quality & Architecture:** Strict adherence to **SOLID**, **KISS**, **SoC**, and **DRY**.
 2. **TypeScript (Strict Mode):** Zero `any` policy.

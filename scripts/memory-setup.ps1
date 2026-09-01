@@ -34,12 +34,12 @@ function Prompt-Value {
 }
 
 function Confirm-Choice {
-    # Confirm-Choice <message> <default_yes and/n> ; returns $true if yes
+    # Confirm-Choice <message> <default_yes y/n> ; returns $true if yes
     param([string]$Message, [string]$Default)
-    if (-not $INTERACTIVE) { return ($Default -in @('and', 'Y')) }
-    $answer = Read-Host "${Message} (and/n) [${Default}]"
+    if (-not $INTERACTIVE) { return ($Default -in @('y', 'Y')) }
+    $answer = Read-Host "${Message} (y/n) [${Default}]"
     if ([string]::IsNullOrWhiteSpace($answer)) { $answer = $Default }
-    return ($answer -in @('and', 'Y'))
+    return ($answer -in @('y', 'Y'))
 }
 
 function Sanitize-Name {
