@@ -65,7 +65,7 @@ link_with_skip "${REPO_DIR}/config/mcp.json" "${GEMINI_CONFIG_DIR}/mcp.json"
 link_with_skip "${REPO_DIR}/config/mcp.json" "${GEMINI_CONFIG_DIR}/mcp_config.json"
 
 echo "🔗 Linking GEMINI.md to Antigravity global config (${GEMINI_CONFIG_DIR}/GEMINI.md)..."
-link_with_skip "${REPO_DIR}/GEMINI.md" "${GEMINI_CONFIG_DIR}/GEMINI.md"
+link_with_skip "${REPO_DIR}/docs/en/GEMINI.md" "${GEMINI_CONFIG_DIR}/GEMINI.md"
 
 # Remove legacy hardcoded backup tokens if existing
 if [ -f "${GEMINI_CONFIG_DIR}/mcp_config.json.backup" ]; then
@@ -110,7 +110,7 @@ echo "🔗 Linking config/dcp.jsonc to OpenCode config (${OPENCODE_CONFIG_DIR}/d
 link_with_skip "${REPO_DIR}/config/dcp.jsonc" "${OPENCODE_CONFIG_DIR}/dcp.jsonc"
 
 echo "🔗 Linking AGENTS.md to OpenCode config (${OPENCODE_CONFIG_DIR}/AGENTS.md)..."
-link_with_skip "${REPO_DIR}/AGENTS.md" "${OPENCODE_CONFIG_DIR}/AGENTS.md"
+link_with_skip "${REPO_DIR}/docs/en/AGENTS.md" "${OPENCODE_CONFIG_DIR}/AGENTS.md"
 
 echo "🔗 Linking opencode agents to OpenCode config (${OPENCODE_CONFIG_DIR}/agents)..."
 mkdir -p "${OPENCODE_CONFIG_DIR}/agents"

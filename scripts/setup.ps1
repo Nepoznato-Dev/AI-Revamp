@@ -197,7 +197,7 @@ $GEMINI_CONFIG_DIR = Join-Path $HOME '.gemini\config'
 
 Link-Dir -Path (Join-Path $GEMINI_CONFIG_DIR 'skills')     -Target (Join-Path $REPO_DIR 'skills')
 Link-File -Path (Join-Path $GEMINI_CONFIG_DIR 'skills.json') -Source (Join-Path $REPO_DIR 'skills.json')
-Link-File -Path (Join-Path $GEMINI_CONFIG_DIR 'GEMINI.md')   -Source (Join-Path $REPO_DIR 'GEMINI.md')
+Link-File -Path (Join-Path $GEMINI_CONFIG_DIR 'GEMINI.md')   -Source (Join-Path $REPO_DIR 'docs/en/GEMINI.md')
 Link-File -Path (Join-Path $GEMINI_CONFIG_DIR 'mcp.json')    -Source (Join-Path $REPO_DIR 'mcp.json')
 Link-File -Path (Join-Path $GEMINI_CONFIG_DIR 'mcp_config.json') -Source (Join-Path $REPO_DIR 'mcp.json')
 
@@ -268,7 +268,7 @@ $OPENCODE_CONFIG_DIR = Join-Path $HOME '.config\opencode'
 Link-File -Path (Join-Path $OPENCODE_CONFIG_DIR 'opencode.jsonc') -Source (Join-Path $REPO_DIR 'opencode.jsonc')
 Link-File -Path (Join-Path $OPENCODE_CONFIG_DIR 'dcp.jsonc')      -Source (Join-Path $REPO_DIR 'dcp.jsonc')
 Link-File -Path (Join-Path $OPENCODE_CONFIG_DIR 'tui.json')      -Source (Join-Path $REPO_DIR 'tui.json')
-Link-File -Path (Join-Path $OPENCODE_CONFIG_DIR 'AGENTS.md')      -Source (Join-Path $REPO_DIR 'AGENTS.md')
+Link-File -Path (Join-Path $OPENCODE_CONFIG_DIR 'AGENTS.md')      -Source (Join-Path $REPO_DIR 'docs/en/AGENTS.md')
 Link-Dir  -Path (Join-Path $OPENCODE_CONFIG_DIR 'plugins')        -Target (Join-Path $REPO_DIR 'plugins')
 
 $AGENTS_DIR = Join-Path $OPENCODE_CONFIG_DIR 'agents'

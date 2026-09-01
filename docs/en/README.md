@@ -11,13 +11,13 @@ This repository serves as the single source of truth for **OpenCode** and **Anti
 - **Docs and team-facing communication** (PR comments, commit messages, README sections aimed at the team): Spanish when the team reads Spanish.
 - A new document picks one language for its whole content; do not mix within the same file.
 
-Full directives in [`AGENTS.md`](file:///home/carludev/.agent/AGENTS.md).
+Full directives are in [`AGENTS.md`](AGENTS.md).
 
 ---
 
 ## 🏗️ Core Engineering Directives
 
-All AI agents in this workspace operate under strict directives defined in [`AGENTS.md`](file:///home/carludev/.agent/AGENTS.md):
+All AI agents in this workspace operate under strict directives defined in [`AGENTS.md`](AGENTS.md):
 
 1. **Code Quality & Architecture:** Strict adherence to **SOLID**, **KISS**, **SoC**, and **DRY**.
 2. **TypeScript (Strict Mode):** Zero `any` policy.
@@ -107,8 +107,8 @@ Models begin to degrade at approximately 40-44% of their context window (in a 1M
 ├── .gitattributes          # LF line endings + binary markers (cross-platform hardening)
 ├── .editorconfig           # UTF-8 / LF / trailing-newline for editors
 ├── .github/workflows/      # CI: validates JSON/JSONC + rejects BOM/CRLF on PRs
-├── AGENTS.md               # Global directives for OpenCode agents
-├── GEMINI.md               # Global directives for Gemini CLI / Antigravity
+├── docs/en/AGENTS.md       # English global directives for OpenCode agents
+├── docs/en/GEMINI.md       # English directives for Gemini CLI / Antigravity
 ├── config/opencode.jsonc          # OpenCode config: MCPs (local bins) + DCP plugin + skills paths
 ├── config/dcp.jsonc               # DCP plugin config: 40% threshold, permission "ask"
 ├── config/tui.json                # OpenCode TUI config (scroll acceleration)
@@ -119,7 +119,7 @@ Models begin to degrade at approximately 40-44% of their context window (in a 1M
 ├── scripts/setup.sh                # Portable setup script for Unix (macOS, Linux, WSL2)
 ├── scripts/setup.ps1               # Windows setup script (PowerShell 7)
 ├── scripts/setup.cmd               # Windows launcher (ExecutionPolicy bypass + pwsh check)
-└── README.md               # You are here
+└── docs/en/README.md       # English workspace documentation
 ```
 
 ### Cross-platform hardening
@@ -153,7 +153,7 @@ Third-party npm plugins are declared in `config/opencode.jsonc` under `"plugin"`
 
 ### Antigravity / Gemini CLI extension
 
-`extensions/lumusitech/gemini-extension.json` exposes the 6 shared MCP servers to Gemini CLI / Antigravity and points `contextFileName` at `GEMINI.md`. It is linked via `~/.gemini/extensions/lumusitech`. The MCP servers are also declared in `config/mcp.json` (linked to `~/.gemini/config/mcp.json` and `~/.gemini/config/mcp_config.json`) for broad compatibility.
+`extensions/lumusitech/gemini-extension.json` exposes the 6 shared MCP servers to Gemini CLI / Antigravity and points `contextFileName` at `docs/en/GEMINI.md`. It is linked via `~/.gemini/extensions/lumusitech`. The MCP servers are also declared in `config/mcp.json` (linked to `~/.gemini/config/mcp.json` and `~/.gemini/config/mcp_config.json`) for broad compatibility.
 
 Antigravity discovers the shared skills through **two redundant mechanisms** (double safety net):
 
@@ -179,7 +179,7 @@ Antigravity discovers the shared skills through **two redundant mechanisms** (do
 |---|---|---|
 | Skills discovery | `skills.paths` in `config/opencode.jsonc` | `~/.gemini/config/skills` symlink + `config/skills.json` |
 | MCP servers | `mcp` in `config/opencode.jsonc` | `config/mcp.json` + `gemini-extension.json` |
-| Global directives | `AGENTS.md` | `GEMINI.md` |
+| Global directives | `docs/en/AGENTS.md` | `docs/en/GEMINI.md` |
 | Custom agents | `~/.config/opencode/agents/*.md` | Not supported (CLI/IDE rely on hooks + MCP) |
 | Plugins | JS plugins (`plugins/`) + npm plugins | Not supported — use `config/hooks.json` |
 | Lifecycle hooks | `tool.execute.*`, `event`, `shell.env`, ... | `config/hooks.json` (`PreToolUse`, `Stop`, ...) |
@@ -320,9 +320,9 @@ For work larger than one agent session, the pipeline goes **document → decisio
 4. **`/estimate-costs`** — Cost Breakdown Structure using a **rate card**. The agent **never invents rates**: it resolves `<repo>/.config/rates/rate-card.json` → global `~/.agent/.config/rates/rate-card.json`, and flags `RATE MISSING` for unknown roles.
 5. **`/to-tickets`** — executable tickets with blocking edges.
 
-Before using the Wayfinder suite in a repo, run **`/setup-matt-pocock-skills`** once per repo to pick the issue tracker (GitHub by default, or local files) — it writes the *Wayfinding operations* section into the repo's `AGENTS.md`.
+Before using the Wayfinder suite in a repo, run **`/setup-matt-pocock-skills`** once per repo to pick the issue tracker (GitHub by default, or local files) — it writes the *Wayfinding operations* section into the repository directives.
 
-Wayfinder rules: **1 ticket per session**, tickets resolve **decisions** (not build slices), and refer to maps/tickets **by name**. See `AGENTS.md` for the full operating rules.
+Wayfinder rules: **1 ticket per session**, tickets resolve **decisions** (not build slices), and refer to maps/tickets **by name**. See `docs/en/AGENTS.md` for the full operating rules.
 
 ### 📐 Phase planning (Research → Plan → Implement)
 

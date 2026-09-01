@@ -2,7 +2,7 @@
   "name": "lumusitech",
   "version": "1.0.0",
   "description": "Lumusitech global workspace: shared MCP servers and persistent context for Gemini CLI / Antigravity.",
-  "contextFileName": "GEMINI.md",
+  "contextFileName": "docs/en/GEMINI.md",
   "mcpServers": {
     "codebase-memory": {
       "command": "codebase-memory-mcp",
