@@ -174,7 +174,7 @@ if (Test-Path "$HOME\.agent\.env") {
         if ($newProfile.Length -gt 0 -and -not $newProfile.EndsWith("`n")) { $newProfile += "`n" }
         $newProfile += $block + "`n"
         [System.IO.File]::WriteAllText($PROFILE_FILE, $newProfile, (New-Object System.Text.UTF8Encoding($false)))
-        Write-Host "✅ Bloque de carga added a ${PROFILE_FILE} (abre a terminal nuevo for aplicarlo)"
+        Write-Host "✅ Loader block added to ${PROFILE_FILE} (open a new terminal to apply it)"
     }
 }
 
@@ -188,10 +188,10 @@ $LINE_COUNT = {
 if ((Test-Path -LiteralPath $MEM_FILE) -and ((Get-Item -LiteralPath $MEM_FILE).Length -gt 0)) {
     Write-Host "✅ Base de memory per-user ya existe: ${MEM_FILE} ($(& $LINE_COUNT) lines)"
 } elseif (Test-Path -LiteralPath (Join-Path $REPO_DIR 'memory.jsonl')) {
-    if (Confirm-Choice "Migrar el memory.jsonl legacy of the repo a ${MEM_FILE}?" 'and') {
+    if (Confirm-Choice "Migrate the repository legacy memory.jsonl to ${MEM_FILE}?" 'y') {
         Copy-Item -Path (Join-Path $REPO_DIR 'memory.jsonl') -Destination $MEM_FILE -Force
         Write-Host "✅ Migrated memory.jsonl legacy → ${MEM_FILE} ($(& $LINE_COUNT) lines)"
-        if (Confirm-Choice "Eliminar el memory.jsonl of the repo (for no commitear memorias)?" 'and') {
+        if (Confirm-Choice "Remove the repository memory.jsonl (to avoid committing memory)?" 'y') {
             Remove-Item -Path (Join-Path $REPO_DIR 'memory.jsonl') -Force
             Write-Host "✅ Removed $(Join-Path $REPO_DIR 'memory.jsonl')"
         }
@@ -209,4 +209,4 @@ Write-Host "🎉 Memoria per-user lista:"
 Write-Host "   • Archivo:   ${MEM_FILE}"
 Write-Host "   • Variable:  MEMORY_FILE_PATH (in ${ENV_FILE})"
 Write-Host "   • Profile:   $(if ($PROFILE_FILE) { $PROFILE_FILE } else { 'no configurado' })"
-Write-Host "   • Next step: restart opencode for that el MCP memory use la nueva ruta."
+Write-Host "   • Next step: restart opencode so the memory MCP uses the new path."

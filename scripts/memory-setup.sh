@@ -172,10 +172,10 @@ fi
 if [ -s "${MEM_FILE}" ]; then
   echo "✅ Base de memory per-user ya existe: ${MEM_FILE} ($(wc -l < "${MEM_FILE}") lines)"
 elif [ -f "${REPO_DIR}/memory.jsonl" ]; then
-  if confirm "Migrar el memory.jsonl legacy of the repo a ${MEM_FILE}?" and; then
+  if confirm "Migrate the repository legacy memory.jsonl to ${MEM_FILE}?" y; then
     cp "${REPO_DIR}/memory.jsonl" "${MEM_FILE}"
     echo "✅ Migrated memory.jsonl legacy → ${MEM_FILE} ($(wc -l < "${MEM_FILE}") lines)"
-    if confirm "Eliminar el memory.jsonl of the repo (for no commitear memorias)?" and; then
+    if confirm "Remove the repository memory.jsonl (to avoid committing memory)?" y; then
       rm -f "${REPO_DIR}/memory.jsonl"
       echo "✅ Removed ${REPO_DIR}/memory.jsonl"
     fi
@@ -193,4 +193,4 @@ echo "🎉 Memoria per-user lista:"
 echo "   • Archivo:   ${MEM_FILE}"
 echo "   • Variable:  MEMORY_FILE_PATH (in ${ENV_FILE})"
 echo "   • Shell rc:  ${RC_FILE:-no configurado}"
-echo "   • Next step: restart opencode for that el MCP memory use la nueva ruta."
+echo "   • Next step: restart opencode so the memory MCP uses the new path."
