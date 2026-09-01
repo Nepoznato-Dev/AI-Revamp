@@ -42,7 +42,7 @@
 
 ### 4. `memory` (Long-Term Memory Persistence)
 - **Directive:** Store and recall project insights, user preferences, and architectural decision records (ADRs) using `memory` MCP across chat sessions.
-- **Local per-user database:** The memory graph lives in a local per-user file (`$MEMORY_FILE_PATH`, default `~/.local/share/opencode/memory/<github-user>.jsonl`), created by `setup.sh` / `scripts/memory-setup.sh`. It is **never committed, pushed, or PR'd** to this or any other repo. Do not attempt to sync it via git.
+- **Local per-user database:** The memory graph lives in a local per-user file (`$MEMORY_FILE_PATH`, default `~/.local/share/opencode/memory/<github-user>.jsonl`), created by `scripts/setup.sh` / `scripts/memory-setup.sh`. It is **never committed, pushed, or PR'd** to this or any other repo. Do not attempt to sync it via git.
 - **Cross-machine transfer:** To move the graph to another machine, offer `/memory-export` (produces a Markdown document with an embedded JSONL block) and import it there with `/memory-import` (replaces, does not merge).
 - **Session-close offer:** At the end of a session, if the memory graph changed and the user is finishing work, offer to run `/memory-export` so the graph can be carried to another machine. **Only act when the user asks** — never export, import, or transfer memory automatically.
 
@@ -60,7 +60,7 @@
 ## 🧠 Gestión de Contexto y Compresión
 
 - **Zona de degradación:** los modelos empiezan a degradarse a partir de ~40-44% de su ventana de contexto (en un modelo de 1M, ~400k tokens). Por debajo, comprimir es innecesario y degrada el contexto útil; por encima, se trabaja en la zona de degradación.
-- **Umbral de referencia:** ~40% del contexto (`maxContextLimit: "40%"` en `dcp.jsonc`).
+- **Umbral de referencia:** ~40% del contexto (`maxContextLimit: "40%"` en `config/dcp.jsonc`).
 - **Mecanismo:** DCP (`@tarquinen/opencode-dcp`) es el guardrail. Al acercarse al 40%, empuja suavemente al modelo a comprimir (`nudgeForce: "soft"`) y la herramienta `compress` usa `permission: "ask"` → **pide permiso al usuario**.
 - **Decisión del usuario:** la decisión de comprimir la toma el usuario, nunca el agente. **No comprimir sin permiso explícito.** Si el usuario decide seguir sin comprimir, asume el riesgo de degradación.
 - **Auto-compactación nativa:** `compaction.auto: false`. OpenCode no compacta por su cuenta.
