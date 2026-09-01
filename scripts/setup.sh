@@ -9,7 +9,7 @@
 
 set -euo pipefail
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 echo "🚀 Initializing AI Workspace Setup from: ${REPO_DIR}"
 
 # Idempotent link helper: skips when the link already resolves to the target,
@@ -54,15 +54,15 @@ mkdir -p "${GEMINI_CONFIG_DIR}"
 echo "🔗 Linking skills to Antigravity global config (${GEMINI_CONFIG_DIR}/skills)..."
 link_with_skip "${REPO_DIR}/skills" "${GEMINI_CONFIG_DIR}/skills"
 
-echo "🔗 Linking skills.json to Antigravity global config (${GEMINI_CONFIG_DIR}/skills.json)..."
-link_with_skip "${REPO_DIR}/skills.json" "${GEMINI_CONFIG_DIR}/skills.json"
+echo "🔗 Linking config/skills.json to Antigravity global config (${GEMINI_CONFIG_DIR}/skills.json)..."
+link_with_skip "${REPO_DIR}/config/skills.json" "${GEMINI_CONFIG_DIR}/skills.json"
 
-echo "🔗 Linking hooks.json to Antigravity global config (${GEMINI_CONFIG_DIR}/hooks.json)..."
-link_with_skip "${REPO_DIR}/hooks.json" "${GEMINI_CONFIG_DIR}/hooks.json"
+echo "🔗 Linking config/hooks.json to Antigravity global config (${GEMINI_CONFIG_DIR}/hooks.json)..."
+link_with_skip "${REPO_DIR}/config/hooks.json" "${GEMINI_CONFIG_DIR}/hooks.json"
 
-echo "🔗 Linking mcp.json to Antigravity global config (${GEMINI_CONFIG_DIR}/mcp.json and mcp_config.json)..."
-link_with_skip "${REPO_DIR}/mcp.json" "${GEMINI_CONFIG_DIR}/mcp.json"
-link_with_skip "${REPO_DIR}/mcp.json" "${GEMINI_CONFIG_DIR}/mcp_config.json"
+echo "🔗 Linking config/mcp.json to Antigravity global config (${GEMINI_CONFIG_DIR}/mcp.json and mcp_config.json)..."
+link_with_skip "${REPO_DIR}/config/mcp.json" "${GEMINI_CONFIG_DIR}/mcp.json"
+link_with_skip "${REPO_DIR}/config/mcp.json" "${GEMINI_CONFIG_DIR}/mcp_config.json"
 
 echo "🔗 Linking GEMINI.md to Antigravity global config (${GEMINI_CONFIG_DIR}/GEMINI.md)..."
 link_with_skip "${REPO_DIR}/GEMINI.md" "${GEMINI_CONFIG_DIR}/GEMINI.md"
@@ -103,11 +103,11 @@ echo "🔗 Linked Antigravity/Gemini extension (${GEMINI_EXT_DIR}/lumusitech)"
 OPENCODE_CONFIG_DIR="${HOME}/.config/opencode"
 mkdir -p "${OPENCODE_CONFIG_DIR}"
 
-echo "🔗 Linking opencode.jsonc to OpenCode config (${OPENCODE_CONFIG_DIR}/opencode.jsonc)..."
-link_with_skip "${REPO_DIR}/opencode.jsonc" "${OPENCODE_CONFIG_DIR}/opencode.jsonc"
+echo "🔗 Linking config/opencode.jsonc to OpenCode config (${OPENCODE_CONFIG_DIR}/opencode.jsonc)..."
+link_with_skip "${REPO_DIR}/config/opencode.jsonc" "${OPENCODE_CONFIG_DIR}/opencode.jsonc"
 
-echo "🔗 Linking dcp.jsonc to OpenCode config (${OPENCODE_CONFIG_DIR}/dcp.jsonc)..."
-link_with_skip "${REPO_DIR}/dcp.jsonc" "${OPENCODE_CONFIG_DIR}/dcp.jsonc"
+echo "🔗 Linking config/dcp.jsonc to OpenCode config (${OPENCODE_CONFIG_DIR}/dcp.jsonc)..."
+link_with_skip "${REPO_DIR}/config/dcp.jsonc" "${OPENCODE_CONFIG_DIR}/dcp.jsonc"
 
 echo "🔗 Linking AGENTS.md to OpenCode config (${OPENCODE_CONFIG_DIR}/AGENTS.md)..."
 link_with_skip "${REPO_DIR}/AGENTS.md" "${OPENCODE_CONFIG_DIR}/AGENTS.md"
@@ -131,15 +131,15 @@ done
 echo "🔗 Linking opencode plugins to OpenCode config (${OPENCODE_CONFIG_DIR}/plugins)..."
 link_with_skip "${REPO_DIR}/plugins" "${OPENCODE_CONFIG_DIR}/plugins"
 
-echo "🔗 Linking tui.json to OpenCode config (${OPENCODE_CONFIG_DIR}/tui.json)..."
-link_with_skip "${REPO_DIR}/tui.json" "${OPENCODE_CONFIG_DIR}/tui.json"
+echo "🔗 Linking config/tui.json to OpenCode config (${OPENCODE_CONFIG_DIR}/tui.json)..."
+link_with_skip "${REPO_DIR}/config/tui.json" "${OPENCODE_CONFIG_DIR}/tui.json"
 
 # 3b. Per-user local memory database (never committed to the repo)
 echo "🧠 Setting up per-user local memory database..."
 bash "${REPO_DIR}/scripts/memory-setup.sh"
 
 # 3c. Install MCP servers locally and expose their binaries on PATH.
-# This removes `npx -y <pkg>` from opencode.jsonc/mcp.json, so opencode and
+# This removes `npx -y <pkg>` from config/opencode.jsonc and config/mcp.json, so opencode and
 # Antigravity no longer resolve/download packages from the registry at startup.
 echo "📦 Installing local MCP servers (package.json)..."
 LOCAL_BIN_DIR="${HOME}/.local/bin"
@@ -196,7 +196,7 @@ done
 
 # Detect Chrome for playwright; fall back to chromium when absent.
 # PLAYWRIGHT_BROWSER is consumed by opencode/antigravity via env (see
-# opencode.jsonc / mcp.json), so it must be loaded from .env on every shell.
+# config/opencode.jsonc / config/mcp.json), so it must be loaded from .env on every shell.
 echo "🌐 Detecting browser for playwright MCP..."
 PLAYWRIGHT_BROWSER="chromium"
 if [ -x "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]; then
@@ -213,7 +213,7 @@ if [ -f "${REPO_DIR}/.env" ]; then
         sed -i.bak "s/^PLAYWRIGHT_BROWSER=.*/PLAYWRIGHT_BROWSER=${PLAYWRIGHT_BROWSER}/" "${REPO_DIR}/.env"
         rm -f "${REPO_DIR}/.env.bak"
     else
-        printf '\n# Resolved by setup.sh (chrome if installed, else chromium). Do not edit manually.\nPLAYWRIGHT_BROWSER=%s\n' "${PLAYWRIGHT_BROWSER}" >> "${REPO_DIR}/.env"
+        printf '\n# Resolved by scripts/setup.sh (chrome if installed, else chromium). Do not edit manually.\nPLAYWRIGHT_BROWSER=%s\n' "${PLAYWRIGHT_BROWSER}" >> "${REPO_DIR}/.env"
     fi
 fi
 
@@ -299,7 +299,7 @@ for entry in "${VENDOR_SOURCES[@]}"; do
   if [ -f "${REPO_DIR}/skills/${NAME}/SKILL.md" ]; then
     VENDOR_OK=$((VENDOR_OK + 1))
   else
-    echo "  ❌ MISSING ${NAME} (run: setup.sh --refresh-vendored-skills)"
+    echo "  ❌ MISSING ${NAME} (run: scripts/setup.sh --refresh-vendored-skills)"
     VENDOR_MISSING=$((VENDOR_MISSING + 1))
   fi
 done
@@ -343,7 +343,7 @@ SECRET_PATTERNS=(
   "Bearer [A-Za-z0-9]"
 )
 FOUND_SECRET=0
-for cfg in "${REPO_DIR}/mcp.json" "${REPO_DIR}/opencode.jsonc" "${REPO_DIR}/extensions/lumusitech/gemini-extension.json"; do
+for cfg in "${REPO_DIR}/config/mcp.json" "${REPO_DIR}/config/opencode.jsonc" "${REPO_DIR}/extensions/lumusitech/gemini-extension.json"; do
   [ -f "${cfg}" ] || continue
   for pat in "${SECRET_PATTERNS[@]}"; do
     if grep -qE "${pat}" "${cfg}"; then
@@ -375,12 +375,12 @@ for bin in "${MCP_BINS_VERIFY[@]}"; do
     echo "  ✅ OK    ${bin}"
     MCP_OK=$((MCP_OK + 1))
   else
-    echo "  ❌ FAIL  ${bin} (not installed; re-run setup.sh)"
+    echo "  ❌ FAIL  ${bin} (not installed; re-run scripts/setup.sh)"
     MCP_FAIL=$((MCP_FAIL + 1))
   fi
 done
 if [ "${MCP_FAIL}" -gt 0 ]; then
-  echo "⚠️  ${MCP_FAIL} MCP binary(ies) missing. Re-run setup.sh to install."
+  echo "⚠️  ${MCP_FAIL} MCP binary(ies) missing. Re-run scripts/setup.sh to install."
 fi
 
 # 7. Summary & Verification
@@ -407,6 +407,6 @@ echo "----------------------------------------------------------------------"
 echo "  💡 Planning pipeline: wayfinder → setup-matt-pocock-skills → to-spec →"
 echo "     create-work-breakdown-structure → estimate-costs → to-tickets"
 echo "  📐 Phase planning:    plan-phases-create → plan-phases-implement"
-echo "  🔄 Update vendored skills:  setup.sh --refresh-vendored-skills"
+echo "  🔄 Update vendored skills:  scripts/setup.sh --refresh-vendored-skills"
 echo "  🛠️  Per-repo init: run /setup-matt-pocock-skills once in each repo"
 echo "======================================================================"

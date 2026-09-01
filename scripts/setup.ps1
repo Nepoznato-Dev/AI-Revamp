@@ -5,9 +5,9 @@
 # ==============================================================================
 # Idempotent setup script to link custom skills, MCP configurations, and global
 # agent directives for OpenCode and Antigravity (TUI / IDE) on Windows.
-# Mirrors ./setup.sh (Unix). Run with:
-#   setup.cmd                              (recommended wrapper)
-#   pwsh -NoProfile -ExecutionPolicy Bypass -File setup.ps1
+# Mirrors ./scripts/setup.sh (Unix). Run with:
+#   scripts/setup.cmd                              (recommended wrapper)
+#   pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/setup.ps1
 # ==============================================================================
 
 [CmdletBinding()]
@@ -23,14 +23,14 @@ param(
 $ErrorActionPreference = 'Stop'
 
 if (-not $IsWindows) {
-    Write-Error "setup.ps1 is for native Windows PowerShell 7. In WSL2/Linux/macOS use ./setup.sh instead."
+    Write-Error "scripts/setup.ps1 is for native Windows PowerShell 7. In WSL2/Linux/macOS use ./scripts/setup.sh instead."
     exit 1
 }
 
-$REPO_DIR = $PSScriptRoot
+$REPO_DIR = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 Write-Host "🚀 Initializing AI Workspace Setup from: ${REPO_DIR}"
 
-# Support both setup.ps1 --flag and -Flag style args
+# Support both scripts/setup.ps1 --flag and -Flag style args
 $RefreshVendored = $RefreshVendoredSkills -or
                    ($args -contains '--refresh-vendored-skills') -or
                    ($args -contains '-RefreshVendoredSkills')
@@ -126,7 +126,7 @@ function Link-File {
     } else {
         Copy-Item -Path $Source -Destination $Path -Force
         Write-Host "🔗 Copied (no symlink permission): ${Path}"
-        Write-Warning "Re-run setup.ps1 after git pull to propagate repo updates into ${Path}."
+        Write-Warning "Re-run scripts/setup.ps1 after git pull to propagate repo updates into ${Path}."
     }
 }
 
@@ -201,10 +201,10 @@ Link-File -Path (Join-Path $GEMINI_CONFIG_DIR 'GEMINI.md')   -Source (Join-Path 
 Link-File -Path (Join-Path $GEMINI_CONFIG_DIR 'mcp.json')    -Source (Join-Path $REPO_DIR 'mcp.json')
 Link-File -Path (Join-Path $GEMINI_CONFIG_DIR 'mcp_config.json') -Source (Join-Path $REPO_DIR 'mcp.json')
 
-# hooks.json: generated with absolute Windows paths (Antigravity runs hook
+# config/hooks.json: generated with absolute Windows paths (Antigravity runs hook
 # commands through a shell that cannot expand `~`). Written only when content
 # changes so re-runs stay quiet.
-$HOOKS_TEMPLATE = Join-Path $REPO_DIR 'hooks.windows.json'
+$HOOKS_TEMPLATE = Join-Path $REPO_DIR 'config/hooks.windows.json'
 $HOOKS_TARGET = Join-Path $GEMINI_CONFIG_DIR 'hooks.json'
 if (Test-Path -LiteralPath $HOOKS_TEMPLATE) {
     $templateText = [System.IO.File]::ReadAllText($HOOKS_TEMPLATE)
@@ -221,7 +221,7 @@ if (Test-Path -LiteralPath $HOOKS_TEMPLATE) {
         Write-Host "✅ Already configured: ${HOOKS_TARGET}"
     }
 } else {
-    Write-Warning "hooks.windows.json not found; skipping hooks.json generation."
+    Write-Warning "config/hooks.windows.json not found; skipping config/hooks.json generation."
 }
 
 # Remove legacy hardcoded backup tokens if existing
@@ -296,7 +296,7 @@ Write-Host "🧠 Setting up per-user local memory database..."
 & (Join-Path $REPO_DIR 'scripts\memory-setup.ps1')
 
 # 3c. Install MCP servers locally and expose their binaries on PATH.
-# Removes `npx -y <pkg>` from opencode.jsonc/mcp.json so opencode and Antigravity
+# Removes `npx -y <pkg>` from config/opencode.jsonc and config/mcp.json so opencode and Antigravity
 # no longer resolve/download packages from the registry at startup.
 Write-Host "📦 Installing local MCP servers (package.json)..."
 $LOCAL_BIN_DIR = Join-Path $HOME '.local\bin'
@@ -392,7 +392,7 @@ if (Test-Path -LiteralPath $envFile) {
         if ($lines[$i] -match '^PLAYWRIGHT_BROWSER=') { $lines[$i] = $newLine; $found = $true; break }
     }
     if (-not $found) {
-        $lines = $lines + @('', '# Resolved by setup.ps1 (chrome if installed, else chromium). Do not edit manually.', $newLine)
+        $lines = $lines + @('', '# Resolved by scripts/setup.ps1 (chrome if installed, else chromium). Do not edit manually.', $newLine)
     }
     [System.IO.File]::WriteAllLines($envFile, $lines, (New-Object System.Text.UTF8Encoding($false)))
 }
@@ -489,7 +489,7 @@ foreach ($entry in $VENDOR_SOURCES) {
     if (Test-Path -LiteralPath (Join-Path $REPO_DIR "skills\$name\SKILL.md")) {
         $VENDOR_OK++
     } else {
-        Write-Host "  ❌ MISSING ${name} (run: setup.ps1 --refresh-vendored-skills)"
+        Write-Host "  ❌ MISSING ${name} (run: scripts/setup.ps1 --refresh-vendored-skills)"
         $VENDOR_MISSING++
     }
 }
@@ -567,12 +567,12 @@ foreach ($bin in $MCP_BINS_VERIFY) {
         Write-Host "  ✅ OK    ${bin}"
         $MCP_OK++
     } else {
-        Write-Host "  ❌ FAIL  ${bin} (not installed; re-run setup.ps1)"
+        Write-Host "  ❌ FAIL  ${bin} (not installed; re-run scripts/setup.ps1)"
         $MCP_FAIL++
     }
 }
 if ($MCP_FAIL -gt 0) {
-    Write-Host "⚠️  ${MCP_FAIL} MCP binary(ies) missing. Re-run setup.ps1 to install."
+    Write-Host "⚠️  ${MCP_FAIL} MCP binary(ies) missing. Re-run scripts/setup.ps1 to install."
 }
 
 # ==============================================================================
@@ -671,6 +671,6 @@ Write-Host "--------------------------------------------------------------------
 Write-Host "  💡 Planning pipeline: wayfinder → setup-matt-pocock-skills → to-spec →"
 Write-Host "     create-work-breakdown-structure → estimate-costs → to-tickets"
 Write-Host "  📐 Phase planning:    plan-phases-create → plan-phases-implement"
-Write-Host "  🔄 Update vendored skills:  setup.ps1 --refresh-vendored-skills"
+Write-Host "  🔄 Update vendored skills:  scripts/setup.ps1 --refresh-vendored-skills"
 Write-Host "  🛠️  Per-repo init: run /setup-matt-pocock-skills once in each repo"
 Write-Host "======================================================================"

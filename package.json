@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Local install of MCP servers so setup.sh can expose their binaries on PATH (no npx -y at startup).",
+  "description": "Local install of MCP servers so scripts/setup.sh can expose their binaries on PATH (no npx -y at startup).",
   "dependencies": {
     "@astudioplus/codegraph-mcp": "0.20.1",
     "@upstash/context7-mcp": "4.0.3",

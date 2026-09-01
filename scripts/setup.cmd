@@ -1,7 +1,7 @@
 @echo off
 rem ==============================================================================
 rem Lumusitech AI Workspace - Windows setup launcher
-rem Wraps setup.ps1 with ExecutionPolicy Bypass (default Windows policy is
+rem Wraps scripts/setup.ps1 with ExecutionPolicy Bypass (default Windows policy is
 rem Restricted) and a friendly error if PowerShell 7 is missing.
 rem ==============================================================================
 setlocal

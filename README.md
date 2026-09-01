@@ -28,7 +28,7 @@ All AI agents in this workspace operate under strict directives defined in [`AGE
 
 ## 🛠️ MCP (Model Context Protocol) Integrations
 
-The workspace configures 6 MCP servers for OpenCode and Antigravity. They are **installed locally by `setup.sh` / `setup.ps1`** (from `package.json`, with `pnpm` → `corepack pnpm` → `npm` fallback) and exposed on `PATH` via `~/.local/bin`, so neither OpenCode nor Antigravity resolves or downloads packages from the registry at startup (no `npx -y`):
+The workspace configures 6 MCP servers for OpenCode and Antigravity. They are **installed locally by `scripts/setup.sh` / `scripts/setup.ps1`** (from `package.json`, with `pnpm` → `corepack pnpm` → `npm` fallback) and exposed on `PATH` via `~/.local/bin`, so neither OpenCode nor Antigravity resolves or downloads packages from the registry at startup (no `npx -y`):
 
 | Server | Binary | Package | Requires |
 |---|---|---|---|
@@ -48,22 +48,22 @@ The workspace configures 6 MCP servers for OpenCode and Antigravity. They are **
 
 ### Playwright browser (Chrome → Chromium fallback)
 
-`setup.sh` / `setup.ps1` detect whether Google Chrome is installed and resolve the browser **automatically**, writing `PLAYWRIGHT_BROWSER` to `~/.agent/.env` (idempotent, re-resolved on every run):
+`scripts/setup.sh` / `scripts/setup.ps1` detect whether Google Chrome is installed and resolve the browser **automatically**, writing `PLAYWRIGHT_BROWSER` to `~/.agent/.env` (idempotent, re-resolved on every run):
 
 - **macOS**: `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`
 - **Linux**: `google-chrome`, `google-chrome-stable`, or `google-chrome-beta` on `PATH`
 - **Windows**: `%ProgramFiles%\Google\Chrome\Application\chrome.exe`, the `(x86)` variant, or `%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe`
 
-If Chrome is present the value is `chrome` (uses the system browser, no download); otherwise `chromium` (Playwright downloads Chromium to `~/.cache/ms-playwright/` on first use). The variable is consumed via `PLAYWRIGHT_MCP_BROWSER` (env var) in `opencode.jsonc` and `mcp.json`.
+If Chrome is present the value is `chrome` (uses the system browser, no download); otherwise `chromium` (Playwright downloads Chromium to `~/.cache/ms-playwright/` on first use). The variable is consumed via `PLAYWRIGHT_MCP_BROWSER` (env var) in `config/opencode.jsonc` and `config/mcp.json`.
 
 ### Prerequisites per machine
 
 - **Node.js 18+ and npm** — required to install the local MCP packages. Install via `nvm`, your distro package manager, or https://nodejs.org.
-- **pnpm** (recommended) — used by `setup.sh` to install the local MCP packages. If absent, the setup falls back to `corepack enable pnpm`, then to `npm`.
-- **Bun** — used by OpenCode to install the DCP plugin declared in `opencode.jsonc` (`"plugin": [...]`). Install via `curl -fsSL https://bun.sh/install | bash` or your package manager.
+- **pnpm** (recommended) — used by `scripts/setup.sh` to install the local MCP packages. If absent, the setup falls back to `corepack enable pnpm`, then to `npm`.
+- **Bun** — used by OpenCode to install the DCP plugin declared in `config/opencode.jsonc` (`"plugin": [...]`). Install via `curl -fsSL https://bun.sh/install | bash` or your package manager.
 - **GitHub token** — `github` MCP requires `GITHUB_TOKEN`; see [Loading Credentials](#-loading-credentials-for-mcp-servers) below.
 
-`setup.sh` installs the MCP packages and verifies their binaries are on `PATH` after setup, reporting any that are missing.
+`scripts/setup.sh` installs the MCP packages and verifies their binaries are on `PATH` after setup, reporting any that are missing.
 
 ---
 
@@ -73,7 +73,7 @@ Los modelos empiezan a degradarse a partir de ~40-44% de su ventana de contexto 
 
 Para gestionarlo se usa **DCP** (`@tarquinen/opencode-dcp`) como guardrail, con la auto-compactación nativa desactivada (`compaction.auto: false`):
 
-- **~40% del contexto** (`maxContextLimit: "40%"` en `dcp.jsonc`): DCP empieza a *empujar suavemente* al modelo a comprimir (`nudgeForce: "soft"`).
+- **~40% del contexto** (`maxContextLimit: "40%"` en `config/dcp.jsonc`): DCP empieza a *empujar suavemente* al modelo a comprimir (`nudgeForce: "soft"`).
 - **Pregunta al usuario:** la herramienta `compress` usa `permission: "ask"`, así que antes de comprimir **se pide permiso al usuario**, quien decide comprimir o continuar (asumiendo el riesgo de degradación).
 - **Sin compactado automático:** ni OpenCode (`compaction.auto: false`) ni DCP comprimen por su cuenta. La decisión siempre es del usuario.
 - **Notificación:** `pruneNotification: "detailed"` informa en el chat cuando se poda contenido.
@@ -97,8 +97,8 @@ Para gestionarlo se usa **DCP** (`@tarquinen/opencode-dcp`) como guardrail, con 
 │   ├── estimate-costs/     # 📊 CBS bottom-up con rate card (skill custom)
 │   └── ...
 ├── .config/rates/          # Global rate card default para estimate-costs
-├── skills.json             # Antigravity explicit skill discovery entry (~/.agent/skills)
-├── hooks.json              # Antigravity lifecycle hooks (env-protection, notifications)
+├── config/skills.json             # Antigravity explicit skill discovery entry (~/.agent/skills)
+├── config/hooks.json              # Antigravity lifecycle hooks (env-protection, notifications)
 ├── hooks/                  # Hook scripts (env-protection.sh, notify.sh)
 ├── agents/                 # OpenCode custom agents (arquitecto.md, ...)
 ├── plugins/                # OpenCode custom plugins (env-protection, notifications, ...)
@@ -109,16 +109,16 @@ Para gestionarlo se usa **DCP** (`@tarquinen/opencode-dcp`) como guardrail, con 
 ├── .github/workflows/      # CI: validates JSON/JSONC + rejects BOM/CRLF on PRs
 ├── AGENTS.md               # Global directives for OpenCode agents
 ├── GEMINI.md               # Global directives for Gemini CLI / Antigravity
-├── opencode.jsonc          # OpenCode config: MCPs (local bins) + DCP plugin + skills paths
-├── dcp.jsonc               # DCP plugin config: 40% threshold, permission "ask"
-├── tui.json                # OpenCode TUI config (scroll acceleration)
-├── package.json            # Local MCP packages installed by setup.sh (pnpm/npm)
-├── mcp.json                # Antigravity shared MCP declarations
+├── config/opencode.jsonc          # OpenCode config: MCPs (local bins) + DCP plugin + skills paths
+├── config/dcp.jsonc               # DCP plugin config: 40% threshold, permission "ask"
+├── config/tui.json                # OpenCode TUI config (scroll acceleration)
+├── package.json            # Local MCP packages installed by scripts/setup.sh (pnpm/npm)
+├── config/mcp.json                # Antigravity shared MCP declarations
 ├── .env.template           # Template for environment variables (GITHUB_TOKEN, etc.)
 ├── .env                    # Local credentials file (ignored by Git)
-├── setup.sh                # Portable setup script for Unix (macOS, Linux, WSL2)
-├── setup.ps1               # Windows setup script (PowerShell 7)
-├── setup.cmd               # Windows launcher (ExecutionPolicy bypass + pwsh check)
+├── scripts/setup.sh                # Portable setup script for Unix (macOS, Linux, WSL2)
+├── scripts/setup.ps1               # Windows setup script (PowerShell 7)
+├── scripts/setup.cmd               # Windows launcher (ExecutionPolicy bypass + pwsh check)
 └── README.md               # You are here
 ```
 
@@ -145,26 +145,26 @@ Custom local plugins live in `~/.agent/plugins/` and are auto-loaded by OpenCode
 | `inject-env.js` | `shell.env` | Loads `~/.agent/.env` into every agent shell |
 | `context-compaction.js` | `experimental.session.compacting` | Preserves task state across session compaction |
 
-Third-party npm plugins are declared in `opencode.jsonc` under `"plugin"`:
+Third-party npm plugins are declared in `config/opencode.jsonc` under `"plugin"`:
 
-- `@tarquinen/opencode-dcp` (pinned `@3.1.15`) — dynamic context pruning. Its `compress` tool replaces stale, closed conversation spans with technical summaries. Configured (see `dcp.jsonc`) to **nudge softly at ~40% of the model context** and to **ask the user** before compressing (`compress.permission: "ask"`).
+- `@tarquinen/opencode-dcp` (pinned `@3.1.15`) — dynamic context pruning. Its `compress` tool replaces stale, closed conversation spans with technical summaries. Configured (see `config/dcp.jsonc`) to **nudge softly at ~40% of the model context** and to **ask the user** before compressing (`compress.permission: "ask"`).
 
 > **Removed:** `@cortexkit/opencode-magic-context` was removed. Its hardcoded ~128k fallback triggered premature compaction in 1M-token models and its auto-update-checker failed at startup. Context management is now handled solely by DCP (see [Gestión de contexto](#-gestión-de-contexto)).
 
 ### Antigravity / Gemini CLI extension
 
-`extensions/lumusitech/gemini-extension.json` exposes the 6 shared MCP servers to Gemini CLI / Antigravity and points `contextFileName` at `GEMINI.md`. It is linked via `~/.gemini/extensions/lumusitech`. The MCP servers are also declared in `mcp.json` (linked to `~/.gemini/config/mcp.json` and `~/.gemini/config/mcp_config.json`) for broad compatibility.
+`extensions/lumusitech/gemini-extension.json` exposes the 6 shared MCP servers to Gemini CLI / Antigravity and points `contextFileName` at `GEMINI.md`. It is linked via `~/.gemini/extensions/lumusitech`. The MCP servers are also declared in `config/mcp.json` (linked to `~/.gemini/config/mcp.json` and `~/.gemini/config/mcp_config.json`) for broad compatibility.
 
 Antigravity discovers the shared skills through **two redundant mechanisms** (double safety net):
 
 - The `skills` symlink at `~/.gemini/config/skills` → `~/.agent/skills`
-- An explicit `skills.json` at `~/.gemini/config/skills.json` declaring `{ "entries": [{ "path": "~/.agent/skills" }] }`
+- An explicit `config/skills.json` at `~/.gemini/config/skills.json` declaring `{ "entries": [{ "path": "~/.agent/skills" }] }`
 
 > **Discovery depth:** Antigravity reads skills only one level deep (`skills/<name>/SKILL.md`) and does **not** recurse into category subfolders. OpenCode does recurse. That is why the skills stay in a flat layout with `design-it` acting as a router, and why skills carrying `disable-model-invocation: true` (10 of them) are only reachable via slash command in the IDE. See [`skills/README.md`](skills/README.md#how-skills-are-discovered).
 
 ### Antigravity lifecycle hooks
 
-`hooks.json` (linked to `~/.gemini/config/hooks.json`) ports two of the OpenCode custom plugins to Antigravity's hook system. Hooks receive a JSON payload on stdin and must emit a JSON result on stdout.
+`config/hooks.json` (linked to `~/.gemini/config/hooks.json`) ports two of the OpenCode custom plugins to Antigravity's hook system. Hooks receive a JSON payload on stdin and must emit a JSON result on stdout.
 
 | Hook | Event | Script | Behaviour |
 |---|---|---|---|
@@ -177,23 +177,23 @@ Antigravity discovers the shared skills through **two redundant mechanisms** (do
 
 | Capability | OpenCode | Antigravity / Gemini |
 |---|---|---|
-| Skills discovery | `skills.paths` in `opencode.jsonc` | `~/.gemini/config/skills` symlink + `skills.json` |
-| MCP servers | `mcp` in `opencode.jsonc` | `mcp.json` + `gemini-extension.json` |
+| Skills discovery | `skills.paths` in `config/opencode.jsonc` | `~/.gemini/config/skills` symlink + `config/skills.json` |
+| MCP servers | `mcp` in `config/opencode.jsonc` | `config/mcp.json` + `gemini-extension.json` |
 | Global directives | `AGENTS.md` | `GEMINI.md` |
 | Custom agents | `~/.config/opencode/agents/*.md` | Not supported (CLI/IDE rely on hooks + MCP) |
-| Plugins | JS plugins (`plugins/`) + npm plugins | Not supported — use `hooks.json` |
-| Lifecycle hooks | `tool.execute.*`, `event`, `shell.env`, ... | `hooks.json` (`PreToolUse`, `Stop`, ...) |
+| Plugins | JS plugins (`plugins/`) + npm plugins | Not supported — use `config/hooks.json` |
+| Lifecycle hooks | `tool.execute.*`, `event`, `shell.env`, ... | `config/hooks.json` (`PreToolUse`, `Stop`, ...) |
 
 ### MCP Memory (per-user, local)
 
-The MCP memory server stores its knowledge graph (entities, relations, observations) in a **per-user local file** that is **never committed to the repo**. The location is injected via the `MEMORY_FILE_PATH` environment variable (see `opencode.jsonc` / `mcp.json`):
+The MCP memory server stores its knowledge graph (entities, relations, observations) in a **per-user local file** that is **never committed to the repo**. The location is injected via the `MEMORY_FILE_PATH` environment variable (see `config/opencode.jsonc` / `config/mcp.json`):
 
 - Unix: `~/.local/share/opencode/memory/<user>.jsonl`
 - Windows: `C:/Users/<user>/.local/share/opencode/memory/<user>.jsonl`
 
 `scripts/memory-setup.{sh,ps1}` detects your identity, writes `MEMORY_FILE_PATH` into `~/.agent/.env`, and ensures your shell/PowerShell profile loads it.
 
-> **Why forward slashes on Windows?** opencode substitutes `{env:MEMORY_FILE_PATH}` in `opencode.jsonc` **verbatim** (without JSON-escaping the value). A Windows path with backslashes (`C:\Users\...`) would inject invalid JSON escape sequences and make opencode fail with `opencode.jsonc is not valid JSON(C)`. `memory-setup.ps1` therefore normalizes the path to forward slashes (`/`), which Windows, PowerShell and Node all accept.
+> **Why forward slashes on Windows?** opencode substitutes `{env:MEMORY_FILE_PATH}` in `config/opencode.jsonc` **verbatim** (without JSON-escaping the value). A Windows path with backslashes (`C:\Users\...`) would inject invalid JSON escape sequences and make opencode fail with `config/opencode.jsonc is not valid JSON(C)`. `memory-scripts/setup.ps1` therefore normalizes the path to forward slashes (`/`), which Windows, PowerShell and Node all accept.
 
 To move the graph to another machine, use the `/memory-export` and `/memory-import` skills (a Markdown document with an embedded JSONL block) — the file itself is never synced via git.
 
@@ -223,7 +223,7 @@ To sync this workspace to a new machine:
 
 3. **Run the setup script:**
    ```bash
-   ./setup.sh
+   ./scripts/setup.sh
    ```
 
 This script will automatically configure OpenCode (`~/.config/opencode/opencode.jsonc`) and Antigravity (`~/.gemini/config/skills` & `~/.gemini/config/mcp.json`) and clean up legacy paths.
@@ -248,18 +248,18 @@ Prerequisites: PowerShell 7, Git for Windows, Node.js 18+ (npm), Bun, GitHub CLI
 
 3. **Run the setup script:**
    ```cmd
-   setup.cmd
+   scripts/setup.cmd
    ```
-   (or directly: `pwsh -NoProfile -ExecutionPolicy Bypass -File setup.ps1`)
+   (or directly: `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/setup.ps1`)
 
    Optional flags:
-   - `setup.cmd -InstallPrerequisites` — installs missing Git/gh/Node/Bun via winget (idempotent: skips anything already installed).
-   - `setup.cmd -ConfigureWindowsTerminal` — adds an "AI Workspace (pwsh 7)" profile to Windows Terminal and sets it as default (backs up `settings.json` first).
-   - `setup.cmd --refresh-vendored-skills` — re-fetches vendored planning skills from upstream.
+   - `scripts/setup.cmd -InstallPrerequisites` — installs missing Git/gh/Node/Bun via winget (idempotent: skips anything already installed).
+   - `scripts/setup.cmd -ConfigureWindowsTerminal` — adds an "AI Workspace (pwsh 7)" profile to Windows Terminal and sets it as default (backs up `settings.json` first).
+   - `scripts/setup.cmd --refresh-vendored-skills` — re-fetches vendored planning skills from upstream.
 
 The script configures the same links as on Unix (`~/.config/opencode`, `~/.gemini/config`, `~/.gemini/extensions`) and generates `~/.gemini/config/hooks.json` pointing at the PowerShell 7 hooks (`.ps1`) with absolute paths.
 
-**Links on Windows:** creating symbolic links requires Developer Mode (Settings → For developers) or an admin shell. `setup.ps1` detects the capability at startup: with symlink permission everything is linked live (a `git pull` propagates instantly); without it, directories use **junctions** (no admin needed) and files are **copied** — in that case re-run `setup.cmd` after every `git pull` to propagate updates.
+**Links on Windows:** creating symbolic links requires Developer Mode (Settings → For developers) or an admin shell. `scripts/setup.ps1` detects the capability at startup: with symlink permission everything is linked live (a `git pull` propagates instantly); without it, directories use **junctions** (no admin needed) and files are **copied** — in that case re-run `scripts/setup.cmd` after every `git pull` to propagate updates.
 
 **PowerShell profile:** the script adds a block to your pwsh profile (`$PROFILE`) that loads `~/.agent/.env` into every new terminal session, so OpenCode MCP servers see `GITHUB_TOKEN` and `MEMORY_FILE_PATH`:
 
@@ -289,13 +289,13 @@ if ($env:GITHUB_TOKEN) { "GITHUB_TOKEN: set (len=$($env:GITHUB_TOKEN.Length))" }
 The setup also verifies the **13 planning skills** are present (8 vendored + 5 custom) and can re-fetch the vendored ones from upstream:
 
 ```bash
-./setup.sh                          # verify + configure
-./setup.sh --refresh-vendored-skills # re-clone mattpocock/skills + agent-almanac and copy updates
+./scripts/setup.sh                          # verify + configure
+./scripts/setup.sh --refresh-vendored-skills # re-clone mattpocock/skills + agent-almanac and copy updates
 ```
 
 ```powershell
-setup.cmd                          # verify + configure
-setup.cmd --refresh-vendored-skills # re-clone mattpocock/skills + agent-almanac and copy updates
+scripts/setup.cmd                          # verify + configure
+scripts/setup.cmd --refresh-vendored-skills # re-clone mattpocock/skills + agent-almanac and copy updates
 ```
 
 Planning skills come from two upstream sources (MIT) plus custom skills committed to this repo:
@@ -335,9 +335,9 @@ For a single large task, once the plan/tickets exist, execute it phase by phase:
 
 ## 🔑 Loading Credentials for MCP Servers
 
-MCP servers that require authentication (e.g. `github`) reference tokens through environment variables in `opencode.jsonc`, like `{env:GITHUB_TOKEN}`. OpenCode reads **process environment variables**, not the `.env` file directly — so merely having `GITHUB_TOKEN` in `~/.agent/.env` is **not enough** for the MCP server to pick it up.
+MCP servers that require authentication (e.g. `github`) reference tokens through environment variables in `config/opencode.jsonc`, like `{env:GITHUB_TOKEN}`. OpenCode reads **process environment variables**, not the `.env` file directly — so merely having `GITHUB_TOKEN` in `~/.agent/.env` is **not enough** for the MCP server to pick it up.
 
-`setup.sh` sources `.env` only within its own execution, so it never persists into your shell. You must load `~/.agent/.env` into your shell profile so every new terminal (and every app launched from it, including OpenCode) has the tokens.
+`scripts/setup.sh` sources `.env` only within its own execution, so it never persists into your shell. You must load `~/.agent/.env` into your shell profile so every new terminal (and every app launched from it, including OpenCode) has the tokens.
 
 ### Add to your shell profile
 
@@ -382,7 +382,7 @@ if (Test-Path "$HOME\.agent\.env") {
 # <<< lumusitech agent env <<<
 ```
 
-Add the block above to your PowerShell profile (run `notepad $PROFILE` in pwsh). `setup.ps1` does this automatically.
+Add the block above to your PowerShell profile (run `notepad $PROFILE` in pwsh). `scripts/setup.ps1` does this automatically.
 
 ### Verify
 
@@ -416,7 +416,7 @@ git config --global credential.https://gist.github.com.helper \
   '!env -u GITHUB_TOKEN -u GH_TOKEN gh auth git-credential'
 ```
 
-> **Automatic:** `setup.sh` applies this fix for you on every machine (it resolves the real `gh` binary path and configures both `github.com` and `gist.github.com`). On Windows, `setup.ps1` applies the equivalent fix (an `unset`-based sh helper, since Git for Windows ships no `env`). You only need the manual commands above if you're not running the setup script.
+> **Automatic:** `scripts/setup.sh` applies this fix for you on every machine (it resolves the real `gh` binary path and configures both `github.com` and `gist.github.com`). On Windows, `scripts/setup.ps1` applies the equivalent fix (an `unset`-based sh helper, since Git for Windows ships no `env`). You only need the manual commands above if you're not running the setup script.
 
 After applying, verify in a shell that loads `.env`:
 
